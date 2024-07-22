@@ -1,4 +1,8 @@
 
+
+Idea from: https://github.com/spot13/pmcalculator
+
+
 <!-- Useful Commands -->
 ## Useful Commands
 
