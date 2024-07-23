@@ -1,12 +1,14 @@
 $(document).ready(function() {
     function updateFields() {
-        const ramTotal = parseFloat($('#ram-total').val());
-        const ramReserved = parseFloat($('#ram-reserved').val());
-        const ramBuffer = parseFloat($('#ram-buffer').val());
-        const processSize = parseFloat($('#process-size').val());
+        let ramTotal = parseFloat($('#ram-total').val());
+        let ramReserved = parseFloat($('#ram-reserved').val());
+        let ramBuffer = parseFloat($('#ram-buffer').val());
+        let processSize = parseFloat($('#process-size').val());
 
         if (ramReserved > ramTotal) {
+            ramReserved = ramTotal;
             $('#ram-reserved').val(ramTotal);
+            $('#ram-reserved-val').val(ramTotal);
         }
 
         $('#ram-total-val').val(ramTotal);
@@ -53,7 +55,7 @@ pm.max_spare_servers = ${$('#max-spare').val()}
     $('#ram-total, #ram-reserved, #ram-buffer, #process-size').on('input change', updateFields);
     $('#ram-total-val, #ram-reserved-val, #ram-buffer-val, #process-size-val').on('input change', function() {
         $('#ram-total').val($('#ram-total-val').val());
-        $('#ram-reserved').val($('#ram-reserved-val').val());
+        $('#ram-reserved').val(Math.min($('#ram-reserved-val').val(), $('#ram-total-val').val()));
         $('#ram-buffer').val($('#ram-buffer-val').val());
         $('#process-size').val($('#process-size-val').val());
         updateFields();
