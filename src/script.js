@@ -1,4 +1,8 @@
 $(document).ready(function() {
+    function validateInput(input) {
+        input.value = input.value.replace(/[^0-9.]/g, '');
+    }
+    
     function updateFields() {
         let ramTotal = parseFloat($('#ram-total').val());
         let ramReserved = parseFloat($('#ram-reserved').val());

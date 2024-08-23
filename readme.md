@@ -6,15 +6,12 @@ This project is a PHP-FPM Process Calculator for optimizing PHP pool settings an
 
 The PHP-FPM Process Calculator helps system administrators and developers optimize their PHP-FPM configurations by providing an easy-to-use interface to calculate the maximum number of child processes, start servers, and spare servers. It includes sliders and input fields for various parameters and generates the configuration settings dynamically.
 
-
 ## Usage
 
 1. Adjust the sliders or input fields for Total RAM, Reserved RAM, RAM Buffer, and Process Size.
 2. The available RAM, available RAM in MB, and PHP-FPM settings will be calculated and displayed in real-time.
 3. Use the "Copy to Clipboard" button to copy the generated PHP-FPM settings for use in your server configuration.
 
-
-<!-- Useful Commands -->
 ## Useful Commands
 
 - Continuously watch for changes in the `style.css` file, updating the output file whenever changes occur.
@@ -23,11 +20,10 @@ The PHP-FPM Process Calculator helps system administrators and developers optimi
 npx tailwindcss -i ./src/output.css -o ./src/output.css --watch
 ```
 
-* Generate a minified version of the CSS
+- Generate a minified version of the CSS
 
 ```bash
-npx tailwindcss -o ./scr/style.min.css --minify 
+npx tailwindcss -o ./scr/output.css --minify 
 ```
-
 
 Idea from: <https://github.com/spot13/pmcalculator>
