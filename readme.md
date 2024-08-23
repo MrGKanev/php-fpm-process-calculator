@@ -23,7 +23,7 @@ npx tailwindcss -i ./src/output.css -o ./src/output.css --watch
 - Generate a minified version of the CSS
 
 ```bash
-npx tailwindcss -o ./scr/output.css --minify 
+npx tailwindcss -o ./src/output.css --minify 
 ```
 
 Idea from: <https://github.com/spot13/pmcalculator>
