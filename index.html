@@ -92,6 +92,26 @@
             </div>
           </form>
         </div>
+
+        <div class="bg-white shadow-lg rounded-lg p-8 mt-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">FAQ: PHP-FPM Process Calculator</h2>
+            
+            <h3 class="text-lg font-bold text-gray-700 mt-4">What is PHP-FPM?</h3>
+            <p class="text-gray-600 mb-4">PHP-FPM (FastCGI Process Manager) is an alternative PHP FastCGI implementation with some additional features useful for sites of any size, especially busier sites.</p>
+            
+            <h3 class="text-lg font-bold text-gray-700 mt-4">Why is process calculation important?</h3>
+            <p class="text-gray-600 mb-4">Proper process calculation ensures optimal use of server resources, improves performance, and prevents issues like memory exhaustion.</p>
+            
+            <h3 class="text-lg font-bold text-gray-700 mt-4">How do I implement these settings?</h3>
+            <p class="text-gray-600 mb-4">These settings can be applied in your php-fpm.conf file or the pool configuration file, typically located in /etc/php/7.x/fpm/pool.d/www.conf (path may vary based on your setup).</p>
+            
+            <h3 class="text-lg font-bold text-gray-700 mt-4">What if my site's traffic fluctuates?</h3>
+            <p class="text-gray-600 mb-4">Consider using the dynamic pm mode, which allows PHP-FPM to adjust the number of child processes based on the current load.</p>
+            
+            <h3 class="text-lg font-bold text-gray-700 mt-4">Can I use these settings for all environments?</h3>
+            <p class="text-gray-600 mb-4">While these calculations provide a good starting point, it's important to test and adjust based on your specific environment and application needs.</p>
+      </div>
+      
       </div>
       <div class="w-full md:w-1/3 px-3">
         <div class="bg-white shadow-lg rounded-lg p-8 mb-10">
