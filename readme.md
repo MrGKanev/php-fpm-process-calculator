@@ -17,13 +17,14 @@ The PHP-FPM Process Calculator helps system administrators and developers optimi
 - Continuously watch for changes in the `style.css` file, updating the output file whenever changes occur.
 
 ```bash
-npx tailwindcss -i ./src/input.css -o ./src/output.css --watch
+npx @tailwindcss/cli -i ./assets/style.css -o ./assets/style.min.css --watch
 ```
 
 - Generate a minified version of the CSS
 
 ```bash
-npx tailwindcss -o ./src/output.css --minify 
+npx @tailwindcss/cli -i ./assets/style.css -o ./assets/style.min.css --minify 
+
 ```
 
 Idea from: <https://github.com/spot13/pmcalculator>
