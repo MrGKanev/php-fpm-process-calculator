@@ -17,9 +17,39 @@
   <div class="container mx-auto p-6">
     <div class="flex flex-wrap -mx-3">
       <div class="w-full md:w-2/3 px-3">
+        <!-- Pool Management Section -->
+        <div class="bg-white shadow-lg rounded-lg p-8 mb-6">
+          <h2 class="text-2xl font-bold text-gray-800 mb-4">PHP-FPM Pool Management</h2>
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <button id="add-pool"
+                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors">
+                Add New Pool
+              </button>
+            </div>
+            <div>
+              <select id="current-pool" class="px-4 py-2 border border-gray-300 rounded-md">
+                <option value="www">www (default)</option>
+              </select>
+            </div>
+          </div>
+          <div id="pool-name-container" class="mb-4 hidden">
+            <label for="pool-name" class="block text-sm font-medium text-gray-600 mb-1">Pool Name</label>
+            <div class="flex">
+              <input id="pool-name" type="text" class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md">
+              <button id="save-pool-name" class="px-4 py-2 bg-green-500 text-white rounded-r-md flex items-center">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="bg-white shadow-lg rounded-lg p-8 mb-6" aria-labelledby="calculator-heading">
           <h1 id="calculator-heading" class="text-3xl font-bold text-gray-800 mb-6 text-center">PHP-FPM Process
             Calculator</h1>
+          <div id="current-pool-name" class="text-lg font-medium text-center mb-4 text-blue-800">
+            Current Pool: www (default)
+          </div>
           <form id="calculator-form">
             <!-- Mobile-First Approach for Sliders and Inputs -->
             <div class="mb-8">
@@ -90,6 +120,57 @@
                 aria-labelledby="process-size-label"
                 class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
             </div>
+
+            <!-- Additional PHP-FPM Parameters -->
+            <div class="mb-8">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Additional PHP-FPM Parameters</h3>
+              <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="max-requests" class="block text-sm font-medium text-gray-600 mb-1">
+                      <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.max-requests"
+                        class="text-blue-800" target="_blank">pm.max_requests</a>
+                    </label>
+                    <div class="flex">
+                      <input id="max-requests" name="max-requests" type="number" min="0" value="0"
+                        class="flex-grow px-4 py-2 border border-gray-300 rounded-md">
+                      <div class="text-xs text-gray-500 mt-1">0 = unlimited</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="process-idle-timeout" class="block text-sm font-medium text-gray-600 mb-1">
+                      <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.process-idle-timeout"
+                        class="text-blue-800" target="_blank">pm.process_idle_timeout</a>
+                    </label>
+                    <div class="flex">
+                      <input id="process-idle-timeout" name="process-idle-timeout" type="number" min="1" value="10"
+                        class="flex-grow px-4 py-2 border border-gray-300 rounded-md">
+                      <span class="px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md flex items-center">s</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="max-spawn-rate" class="block text-sm font-medium text-gray-600 mb-1">
+                      <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.max-spawn-rate"
+                        class="text-blue-800" target="_blank">pm.max_spawn_rate</a>
+                    </label>
+                    <input id="max-spawn-rate" name="max-spawn-rate" type="number" min="1" value="32"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md">
+                  </div>
+
+                  <div>
+                    <label for="status-path" class="block text-sm font-medium text-gray-600 mb-1">
+                      <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.status-path"
+                        class="text-blue-800" target="_blank">pm.status_path</a>
+                    </label>
+                    <input id="status-path" name="status-path" type="text" value="/status"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md">
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Results Section - Mobile-First Approach -->
             <div class="mb-8">
               <div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-md">
@@ -205,8 +286,8 @@
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>What is PHP-FPM?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -215,14 +296,14 @@
                   with some additional features useful for sites of any size, especially busier sites.</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 2 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>Why is process calculation important?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -231,14 +312,14 @@
                   performance, and prevents issues like memory exhaustion.</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 3 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>How do I implement these settings?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -248,14 +329,14 @@
                   setup).</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 4 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>What if my site's traffic fluctuates?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -264,14 +345,14 @@
                   of child processes based on the current load.</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 5 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>Can I use these settings for all environments?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -280,14 +361,14 @@
                   test and adjust based on your specific environment and application needs.</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 6 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>What does 'pm.max_children' represent?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -296,15 +377,15 @@
                   to serve requests. It's crucial for controlling server resource usage.</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 7 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>How do 'pm.start_servers', 'pm.min_spare_servers', and 'pm.max_spare_servers' work
                   together?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -314,14 +395,14 @@
                   pm.max_spare_servers define the minimum and maximum number of idle child processes.</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 8 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>What is the significance of the RAM buffer?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -330,14 +411,14 @@
                   available RAM. It helps ensure system stability and provides room for other OS/processes.</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 9 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>How often should I review and adjust these settings?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -347,14 +428,14 @@
                   practices.</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 10 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>Can this calculator be used for other server configurations besides PHP-FPM?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -364,14 +445,14 @@
                   settings and terminologies may differ.</p>
               </div>
             </div>
-
+          
             <!-- FAQ Item 11 -->
             <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
               <button
                 class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
                 <span>How does PHP-FPM differ from traditional PHP CGI?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -414,8 +495,6 @@
       </div>
     </div>
   </div>
-  <!-- Fixed jQuery path -->
-  <script src="./assets/jquery-3.6.0.min.js"></script>
   <script src="./assets/script.js"></script>
 </body>
 
