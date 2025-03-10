@@ -121,15 +121,37 @@ pm.start_servers = ${document.getElementById("start-servers").value}
 pm.min_spare_servers = ${document.getElementById("min-spare").value}
 pm.max_spare_servers = ${document.getElementById("max-spare").value}
 `;
+    // Update the hidden textarea for copying
     document.getElementById("copyPasteArea").value = configText.trim();
+
+    // Update the visible code preview with syntax highlighting
+    const codePreview = document.getElementById("codePreview");
+    if (codePreview) {
+      codePreview.textContent = configText.trim();
+    }
   }
 
-  // Function to copy text to clipboard
+  // Function to copy text to clipboard with visual feedback
   function copyToClipboard() {
     const copyText = document.getElementById("copyPasteArea");
     copyText.select();
     document.execCommand("copy");
-    alert("Copied to clipboard successfully.");
+
+    // Get copy button
+    const copyButton = document.getElementById("buttonCopy");
+    const originalText = copyButton.textContent;
+
+    // Show success feedback
+    copyButton.textContent = "✓ Copied!";
+    copyButton.classList.add("bg-green-500");
+    copyButton.classList.remove("bg-blue-500");
+
+    // Reset button after 2 seconds
+    setTimeout(() => {
+      copyButton.textContent = originalText;
+      copyButton.classList.remove("bg-green-500");
+      copyButton.classList.add("bg-blue-500");
+    }, 2000);
   }
 
   // Add event listeners to sliders and inputs
@@ -166,27 +188,27 @@ pm.max_spare_servers = ${document.getElementById("max-spare").value}
   // Initial calculation on page load
   updateFields();
 
-  // Add a subtle indicator that localStorage is working
-  const container = document.querySelector(".container");
-  const notice = document.createElement("div");
-  notice.className =
-    "bg-blue-500 text-white px-4 py-2 rounded-md mb-4 text-center";
-  notice.textContent =
-    "Your settings will be remembered when you return to this page";
+  // No notification needed
 
-  // Insert the notice at the top of the container
-  if (container && container.firstChild) {
-    container.insertBefore(notice, container.firstChild);
+  // FAQ Accordion functionality
+  const faqQuestions = document.querySelectorAll(".faq-question");
 
-    // Auto-hide the notice after 5 seconds
-    setTimeout(() => {
-      notice.style.opacity = "0";
-      notice.style.transition = "opacity 1s ease-out";
+  faqQuestions.forEach((question) => {
+    question.addEventListener("click", function () {
+      // Toggle the active class on the question
+      this.classList.toggle("active");
 
-      // Remove from DOM after fade out
-      setTimeout(() => {
-        notice.remove();
-      }, 1000);
-    }, 5000);
-  }
+      // Find the associated answer
+      const answer = this.nextElementSibling;
+
+      // Toggle the answer visibility
+      if (answer.classList.contains("hidden")) {
+        answer.classList.remove("hidden");
+        this.querySelector(".faq-arrow").classList.add("rotate-180");
+      } else {
+        answer.classList.add("hidden");
+        this.querySelector(".faq-arrow").classList.remove("rotate-180");
+      }
+    });
+  });
 });

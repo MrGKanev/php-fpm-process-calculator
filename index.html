@@ -21,160 +21,367 @@
           <h1 id="calculator-heading" class="text-3xl font-bold text-gray-800 mb-6 text-center">PHP-FPM Process
             Calculator</h1>
           <form id="calculator-form">
-            <div class="mb-6">
-              <label for="ram-total" class="block text-lg font-medium text-gray-700 mb-2">
-                Total RAM (GB)
-                <input id="ram-total-val" type="number" min="1" max="512" step="1" value="4"
-                  aria-labelledby="ram-total-label" class="text-blue-800 ml-2 w-16 text-center border rounded-md">
-              </label>
+            <!-- Mobile-First Approach for Sliders and Inputs -->
+            <div class="mb-8">
+              <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                <label for="ram-total" class="text-lg font-medium text-gray-700 mb-2 md:mb-0">Total RAM (GB)</label>
+                <div class="relative w-full md:w-36 h-10">
+                  <input id="ram-total-val" type="number" min="1" max="512" step="1" value="4"
+                    class="absolute top-0 left-0 w-full h-full text-blue-800 text-center border rounded-md pl-4 pr-4"
+                    aria-labelledby="ram-total-label">
+                  <div class="absolute top-0 right-0 bottom-0 flex items-center pr-2 pointer-events-none">
+                    <span class="text-gray-500">GB</span>
+                  </div>
+                </div>
+              </div>
               <input id="ram-total" name="ram-total" type="range" min="1" max="512" step="1" value="4"
                 aria-labelledby="ram-total-label"
                 class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
             </div>
-            <div class="mb-6">
-              <label for="ram-reserved" class="block text-lg font-medium text-gray-700 mb-2">
-                Reserved RAM (GB)
-                <input id="ram-reserved-val" type="number" min="0.25" max="512" step="0.25" value="1"
-                  aria-labelledby="ram-reserved-label" class="text-blue-800 ml-2 w-16 text-center border rounded-md">
-              </label>
+
+            <div class="mb-8">
+              <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                <label for="ram-reserved" class="text-lg font-medium text-gray-700 mb-2 md:mb-0">Reserved RAM
+                  (GB)</label>
+                <div class="relative w-full md:w-36 h-10">
+                  <input id="ram-reserved-val" type="number" min="0.25" max="512" step="0.25" value="1"
+                    class="absolute top-0 left-0 w-full h-full text-blue-800 text-center border rounded-md pl-4 pr-4"
+                    aria-labelledby="ram-reserved-label">
+                  <div class="absolute top-0 right-0 bottom-0 flex items-center pr-2 pointer-events-none">
+                    <span class="text-gray-500">GB</span>
+                  </div>
+                </div>
+              </div>
               <input id="ram-reserved" name="ram-reserved" type="range" min="0.25" max="512" step="0.25" value="1"
                 aria-labelledby="ram-reserved-label"
                 class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
             </div>
-            <div class="mb-6">
-              <label for="ram-buffer" class="block text-lg font-medium text-gray-700 mb-2">
-                RAM Buffer (%)
-                <input id="ram-buffer-val" type="number" min="0" max="100" step="1" value="10"
-                  aria-labelledby="ram-buffer-label" class="text-blue-800 ml-2 w-16 text-center border rounded-md">
-              </label>
+
+            <div class="mb-8">
+              <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                <label for="ram-buffer" class="text-lg font-medium text-gray-700 mb-2 md:mb-0">RAM Buffer</label>
+                <div class="relative w-full md:w-36 h-10">
+                  <input id="ram-buffer-val" type="number" min="0" max="100" step="1" value="10"
+                    class="absolute top-0 left-0 w-full h-full text-blue-800 text-center border rounded-md pl-4 pr-4"
+                    aria-labelledby="ram-buffer-label">
+                  <div class="absolute top-0 right-0 bottom-0 flex items-center pr-2 pointer-events-none">
+                    <span class="text-gray-500">%</span>
+                  </div>
+                </div>
+              </div>
               <input id="ram-buffer" name="ram-buffer" type="range" min="0" max="100" step="1" value="10"
                 aria-labelledby="ram-buffer-label"
                 class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
             </div>
-            <div class="mb-6">
-              <label for="process-size" class="block text-lg font-medium text-gray-700 mb-2">
-                Process Size (MB)
-                <input id="process-size-val" type="number" min="1" max="1024" step="1" value="32"
-                  aria-labelledby="process-size-label" class="text-blue-800 ml-2 w-16 text-center border rounded-md">
-              </label>
+
+            <div class="mb-8">
+              <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                <label for="process-size" class="text-lg font-medium text-gray-700 mb-2 md:mb-0">Process Size</label>
+                <div class="relative w-full md:w-36 h-10">
+                  <input id="process-size-val" type="number" min="1" max="1024" step="1" value="32"
+                    class="absolute top-0 left-0 w-full h-full text-blue-800 text-center border rounded-md pl-4 pr-4"
+                    aria-labelledby="process-size-label">
+                  <div class="absolute top-0 right-0 bottom-0 flex items-center pr-2 pointer-events-none">
+                    <span class="text-gray-500">MB</span>
+                  </div>
+                </div>
+              </div>
               <input id="process-size" name="process-size" type="range" min="1" max="1024" step="1" value="32"
                 aria-labelledby="process-size-label"
                 class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
             </div>
-            <div class="mb-6">
-              <label for="ram-available" class="block text-lg font-medium text-gray-700 mb-2">Available RAM (GB)</label>
-              <input id="ram-available" name="ram-available" type="text" readonly aria-readonly="true"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100"
-                aria-labelledby="ram-available-label">
+            <!-- Results Section - Mobile-First Approach -->
+            <div class="mb-8">
+              <div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-md">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Calculated Results</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="ram-available" class="block text-sm font-medium text-gray-600 mb-1">Available
+                      RAM</label>
+                    <div class="flex">
+                      <input id="ram-available" name="ram-available" type="text" readonly aria-readonly="true"
+                        class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md bg-gray-100 font-bold text-blue-800"
+                        aria-labelledby="ram-available-label">
+                      <span class="px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md flex items-center">GB</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="ram-available-mb" class="block text-sm font-medium text-gray-600 mb-1">Available
+                      RAM</label>
+                    <div class="flex">
+                      <input id="ram-available-mb" name="ram-available-mb" type="text" readonly aria-readonly="true"
+                        class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md bg-gray-100 font-bold text-blue-800"
+                        aria-labelledby="ram-available-mb-label">
+                      <span class="px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md flex items-center">MB</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="mb-6">
-              <label for="ram-available-mb" class="block text-lg font-medium text-gray-700 mb-2">Available RAM
-                (MB)</label>
-              <input id="ram-available-mb" name="ram-available-mb" type="text" readonly aria-readonly="true"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100"
-                aria-labelledby="ram-available-mb-label">
+            <!-- PHP-FPM Settings - Mobile-First Approach -->
+            <div class="mb-8">
+              <div class="p-4 border-l-4 border-green-500 bg-green-50 rounded-md">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">PHP-FPM Settings</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="max-children" class="block text-sm font-medium text-gray-600 mb-1">
+                      <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.max-children"
+                        class="text-blue-800" target="_blank">pm.max_children</a>
+                    </label>
+                    <input id="max-children" name="max-children" type="text" readonly aria-readonly="true"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 font-bold text-green-700"
+                      aria-labelledby="max-children-label">
+                  </div>
+
+                  <div>
+                    <label for="start-servers" class="block text-sm font-medium text-gray-600 mb-1">
+                      <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.start-servers"
+                        class="text-blue-800" target="_blank">pm.start_servers</a>
+                    </label>
+                    <input id="start-servers" name="start-servers" type="text" readonly aria-readonly="true"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 font-bold text-green-700"
+                      aria-labelledby="start-servers-label">
+                  </div>
+
+                  <div>
+                    <label for="min-spare" class="block text-sm font-medium text-gray-600 mb-1">
+                      <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.min-spare-servers"
+                        class="text-blue-800" target="_blank">pm.min_spare_servers</a>
+                    </label>
+                    <input id="min-spare" name="min-spare" type="text" readonly aria-readonly="true"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 font-bold text-green-700"
+                      aria-labelledby="min-spare-label">
+                  </div>
+
+                  <div>
+                    <label for="max-spare" class="block text-sm font-medium text-gray-600 mb-1">
+                      <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.max-spare-servers"
+                        class="text-blue-800" target="_blank">pm.max_spare_servers</a>
+                    </label>
+                    <input id="max-spare" name="max-spare" type="text" readonly aria-readonly="true"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 font-bold text-green-700"
+                      aria-labelledby="max-spare-label">
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="mb-6">
-              <label for="max-children" class="block text-lg font-medium text-gray-700 mb-2">
-                <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.max-children"
-                  class="text-blue-800" target="_blank">pm.max_children</a>
-              </label>
-              <input id="max-children" name="max-children" type="text" readonly aria-readonly="true"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100"
-                aria-labelledby="max-children-label">
-            </div>
-            <div class="mb-6">
-              <label for="start-servers" class="block text-lg font-medium text-gray-700 mb-2">
-                <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.start-servers"
-                  class="text-blue-800" target="_blank">pm.start_servers</a>
-              </label>
-              <input id="start-servers" name="start-servers" type="text" readonly aria-readonly="true"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100"
-                aria-labelledby="start-servers-label">
-            </div>
-            <div class="mb-6">
-              <label for="min-spare" class="block text-lg font-medium text-gray-700 mb-2">
-                <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.min-spare-servers"
-                  class="text-blue-800" target="_blank">pm.min_spare_servers</a>
-              </label>
-              <input id="min-spare" name="min-spare" type="text" readonly aria-readonly="true"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100"
-                aria-labelledby="min-spare-label">
-            </div>
-            <div class="mb-6">
-              <label for="max-spare" class="block text-lg font-medium text-gray-700 mb-2">
-                <a href="https://www.php.net/manual/en/install.fpm.configuration.php#pm.max-spare-servers"
-                  class="text-blue-800" target="_blank">pm.max_spare_servers</a>
-              </label>
-              <input id="max-spare" name="max-spare" type="text" readonly aria-readonly="true"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100"
-                aria-labelledby="max-spare-label">
-            </div>
-            <div class="mb-6">
-              <label for="copyPasteArea" class="block text-lg font-medium text-gray-700 mb-2">PHP Pool Settings /
-                Tuning</label>
-              <textarea id="copyPasteArea" name="copyPasteArea" rows="4" aria-readonly="true"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100"
-                aria-labelledby="copyPasteArea-label"></textarea>
-              <button id="buttonCopy" type="button" class="mt-4 bg-blue-500 text-white py-2 w-full rounded-md">Copy to
-                Clipboard</button>
+            <!-- Copy/Paste Area - Mobile-First Approach -->
+            <div class="mb-8">
+              <div class="p-4 border-l-4 border-blue-500 bg-gray-50 rounded-md">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                  <label for="copyPasteArea" class="text-lg font-bold text-gray-800">PHP Pool Settings / Tuning</label>
+                  <button id="buttonCopy" type="button"
+                    class="mt-2 md:mt-0 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
+                      fill="currentColor">
+                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                      <path
+                        d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                    </svg>
+                    Copy to Clipboard
+                  </button>
+                </div>
+                <div class="bg-gray-800 rounded-md p-4 text-white font-mono text-sm overflow-x-auto">
+                  <pre id="codePreview" class="whitespace-pre"></pre>
+                </div>
+                <textarea id="copyPasteArea" name="copyPasteArea" rows="4" aria-readonly="true" class="hidden w-full"
+                  aria-labelledby="copyPasteArea-label"></textarea>
+              </div>
             </div>
           </form>
         </div>
 
+        <!-- FAQ Section with Accordion-style Display -->
         <div class="bg-white shadow-lg rounded-lg p-8 mt-6">
           <h2 class="text-2xl font-bold text-gray-800 mb-6">FAQ: PHP-FPM Process Calculator</h2>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">What is PHP-FPM?</h3>
-          <p class="text-gray-600 mb-4">PHP-FPM (FastCGI Process Manager) is an alternative PHP FastCGI implementation
-            with some additional features useful for sites of any size, especially busier sites.</p>
+          <!-- FAQ Accordion -->
+          <div id="faqAccordion" class="space-y-4">
+            <!-- FAQ Item 1 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>What is PHP-FPM?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">PHP-FPM (FastCGI Process Manager) is an alternative PHP FastCGI implementation
+                  with some additional features useful for sites of any size, especially busier sites.</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">Why is process calculation important?</h3>
-          <p class="text-gray-600 mb-4">Proper process calculation ensures optimal use of server resources, improves
-            performance, and prevents issues like memory exhaustion.</p>
+            <!-- FAQ Item 2 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>Why is process calculation important?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">Proper process calculation ensures optimal use of server resources, improves
+                  performance, and prevents issues like memory exhaustion.</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">How do I implement these settings?</h3>
-          <p class="text-gray-600 mb-4">These settings can be applied in your php-fpm.conf file or the pool
-            configuration file, typically located in /etc/php/8.x/fpm/pool.d/www.conf (path may vary based on your
-            setup).</p>
+            <!-- FAQ Item 3 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>How do I implement these settings?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">These settings can be applied in your php-fpm.conf file or the pool
+                  configuration file, typically located in /etc/php/8.x/fpm/pool.d/www.conf (path may vary based on your
+                  setup).</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">What if my site's traffic fluctuates?</h3>
-          <p class="text-gray-600 mb-4">Consider using the dynamic pm mode, which allows PHP-FPM to adjust the number of
-            child processes based on the current load.</p>
+            <!-- FAQ Item 4 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>What if my site's traffic fluctuates?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">Consider using the dynamic pm mode, which allows PHP-FPM to adjust the number
+                  of child processes based on the current load.</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">Can I use these settings for all environments?</h3>
-          <p class="text-gray-600 mb-4">While these calculations provide an excellent starting point, it's important to
-            test and adjust based on your specific environment and application needs.</p>
+            <!-- FAQ Item 5 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>Can I use these settings for all environments?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">While these calculations provide an excellent starting point, it's important to
+                  test and adjust based on your specific environment and application needs.</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">What does 'pm.max_children' represent?</h3>
-          <p class="text-gray-600 mb-4">pm.max_children sets the maximum number of child processes that can be created
-            to serve requests. It's crucial for controlling server resource usage.</p>
+            <!-- FAQ Item 6 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>What does 'pm.max_children' represent?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">pm.max_children sets the maximum number of child processes that can be created
+                  to serve requests. It's crucial for controlling server resource usage.</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">How do 'pm.start_servers', 'pm.min_spare_servers', and
-            'pm.max_spare_servers' work together?</h3>
-          <p class="text-gray-600 mb-4">These settings work together to manage the number of idle processes.
-            pm.start_servers sets the number of child processes created on startup, while pm.min_spare_servers and
-            pm.max_spare_servers define the minimum and maximum number of idle child processes.</p>
+            <!-- FAQ Item 7 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>How do 'pm.start_servers', 'pm.min_spare_servers', and 'pm.max_spare_servers' work
+                  together?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">These settings work together to manage the number of idle processes.
+                  pm.start_servers sets the number of child processes created on startup, while pm.min_spare_servers and
+                  pm.max_spare_servers define the minimum and maximum number of idle child processes.</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">What is the significance of the RAM buffer?</h3>
-          <p class="text-gray-600 mb-4">The RAM buffer is a safety margin to prevent your server from using all
-            available RAM. It helps ensure system stability and provides room for other OS/processes.</p>
+            <!-- FAQ Item 8 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>What is the significance of the RAM buffer?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">The RAM buffer is a safety margin to prevent your server from using all
+                  available RAM. It helps ensure system stability and provides room for other OS/processes.</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">How often should I review and adjust these settings?</h3>
-          <p class="text-gray-600 mb-4">It's recommended to review your PHP-FPM settings regularly, especially after
-            significant changes in traffic patterns or server resources. Monthly or quarterly reviews are common
-            practices.</p>
+            <!-- FAQ Item 9 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>How often should I review and adjust these settings?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">It's recommended to review your PHP-FPM settings regularly, especially after
+                  significant changes in traffic patterns or server resources. Monthly or quarterly reviews are common
+                  practices.</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">Can this calculator be used for other server configurations
-            besides PHP-FPM?</h3>
-          <p class="text-gray-600 mb-4">While this calculator is specifically designed for PHP-FPM, the general
-            principles of resource allocation can be applied to other server configurations. However, the specific
-            settings and terminologies may differ.</p>
+            <!-- FAQ Item 10 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>Can this calculator be used for other server configurations besides PHP-FPM?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">While this calculator is specifically designed for PHP-FPM, the general
+                  principles of resource allocation can be applied to other server configurations. However, the specific
+                  settings and terminologies may differ.</p>
+              </div>
+            </div>
 
-          <h3 class="text-lg font-bold text-gray-700 mt-4">How does PHP-FPM differ from traditional PHP CGI?</h3>
-          <p class="text-gray-600 mb-4">PHP-FPM offers better performance and more granular control over process
-            management compared to traditional PHP CGI. It allows for better resource utilization and can handle
-            high-traffic situations more efficiently.</p>
+            <!-- FAQ Item 11 -->
+            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+              <button
+                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+                <span>How does PHP-FPM differ from traditional PHP CGI?</span>
+                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+                <p class="text-gray-600">PHP-FPM offers better performance and more granular control over process
+                  management compared to traditional PHP CGI. It allows for better resource utilization and can handle
+                  high-traffic situations more efficiently.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
