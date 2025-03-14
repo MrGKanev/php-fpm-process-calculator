@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Data structure for storing pool configurations
   let pools = {};
   let currentPool = DEFAULT_POOL;
+  let pmMode = "dynamic"; // Default PM mode
 
   // Function to get storage key for a specific pool
   function getStorageKey(poolName) {
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
       processIdleTimeout: document.getElementById("process-idle-timeout").value,
       maxSpawnRate: document.getElementById("max-spawn-rate").value,
       statusPath: document.getElementById("status-path").value,
+      pmMode: pmMode,
     };
 
     try {
@@ -90,6 +92,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("status-path").value =
           settings.statusPath || "/status";
 
+        // Load PM mode if available
+        if (settings.pmMode) {
+          pmMode = settings.pmMode;
+          updatePmModeUI();
+        }
+
         return true;
       }
     } catch (e) {
@@ -100,7 +108,22 @@ document.addEventListener("DOMContentLoaded", function () {
     return false;
   }
 
-  // Main function to update all fields
+  // Function to update PM mode UI display
+  function updatePmModeUI() {
+    // Update PM mode selector if it exists
+    const pmModeSelector = document.getElementById("pm-mode");
+    if (pmModeSelector) {
+      pmModeSelector.value = pmMode;
+    }
+  }
+
+  // Function to toggle PM mode between dynamic and static
+  function togglePmMode(mode) {
+    pmMode = mode;
+    updateFields();
+  }
+
+  // Improved calculation function based on high traffic optimization guidelines
   function updateFields() {
     let ramTotal = parseFloat(document.getElementById("ram-total").value);
     let ramReserved = parseFloat(document.getElementById("ram-reserved").value);
@@ -126,11 +149,23 @@ document.addEventListener("DOMContentLoaded", function () {
       Math.round((ramTotal - ramReserved) * buffer * 10) / 10;
     const availableRamMb = Math.round(availableRam * 1024);
 
-    // Calculate PHP-FPM process settings
+    // Calculate PHP-FPM process settings with improved ratios for high traffic
     const maxChildren = Math.floor(availableRamMb / processSize);
-    const startServers = Math.floor(maxChildren * 0.25);
-    const minSpare = Math.floor(maxChildren * 0.25);
-    const maxSpare = Math.floor(maxChildren * 0.75);
+
+    let startServers, minSpare, maxSpare;
+
+    if (pmMode === "static") {
+      // In static mode, all values are equal to max_children
+      startServers = maxChildren;
+      minSpare = maxChildren;
+      maxSpare = maxChildren;
+    } else {
+      // Dynamic mode calculations
+      // For high traffic sites, we want more aggressive scaling
+      startServers = Math.floor(maxChildren * 0.3);
+      minSpare = startServers;
+      maxSpare = Math.floor(maxChildren * 0.8);
+    }
 
     // Update result fields
     document.getElementById("ram-available").value = availableRam;
@@ -148,7 +183,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.saveTimeout = setTimeout(saveSettings, 500);
   }
 
-  // Function to generate the configuration text
+  // Enhanced configuration generator with comments for better user guidance
   function generateConfigCopy() {
     const maxRequests = document.getElementById("max-requests").value;
     const processIdleTimeout = document.getElementById(
@@ -156,30 +191,109 @@ document.addEventListener("DOMContentLoaded", function () {
     ).value;
     const maxSpawnRate = document.getElementById("max-spawn-rate").value;
     const statusPath = document.getElementById("status-path").value;
+    const processSize = document.getElementById("process-size").value;
 
-    let configText = `[${currentPool}]
-pm = dynamic
-pm.max_children = ${document.getElementById("max-children").value}
+    // Calculate optimal realpath_cache settings based on server size
+    // For larger servers, increase the cache size
+    const realpathCacheSize =
+      Math.min(4096, Math.max(256, Math.floor(parseInt(processSize) * 2))) +
+      "k";
+    const realpathCacheTTL = 120; // 2 minutes is a good default
+
+    // Calculate optimal OPcache settings
+    const opcacheMemory = Math.min(
+      512,
+      Math.max(128, Math.floor(parseInt(processSize) * 4))
+    );
+
+    let configText = `; PHP-FPM Pool Configuration for ${currentPool}
+; Optimized for high-traffic environments
+
+[${currentPool}]
+; Process manager mode (${pmMode})
+pm = ${pmMode}
+
+; Maximum number of child processes (based on available RAM)
+pm.max_children = ${document.getElementById("max-children").value}`;
+
+    // Only add these settings for dynamic mode
+    if (pmMode === "dynamic") {
+      configText += `
+
+; Initial number of child processes created on startup
 pm.start_servers = ${document.getElementById("start-servers").value}
+
+; Minimum number of idle server processes
 pm.min_spare_servers = ${document.getElementById("min-spare").value}
+
+; Maximum number of idle server processes
 pm.max_spare_servers = ${document.getElementById("max-spare").value}`;
+    }
 
     // Add additional parameters only if they're not empty
     if (maxRequests && maxRequests !== "0") {
-      configText += `\npm.max_requests = ${maxRequests}`;
+      configText += `
+
+; Maximum number of requests each child process handles before respawning
+; Setting to ${maxRequests} helps prevent memory leaks
+pm.max_requests = ${maxRequests}`;
     }
 
     if (processIdleTimeout) {
-      configText += `\npm.process_idle_timeout = ${processIdleTimeout}s`;
+      configText += `
+
+; Number of seconds after which an idle process will be killed
+pm.process_idle_timeout = ${processIdleTimeout}s`;
     }
 
     if (maxSpawnRate) {
-      configText += `\npm.max_spawn_rate = ${maxSpawnRate}`;
+      configText += `
+
+; Maximum rate of children spawned per second
+pm.max_spawn_rate = ${maxSpawnRate}`;
     }
 
     if (statusPath) {
-      configText += `\npm.status_path = ${statusPath}`;
+      configText += `
+
+; URI path for PHP-FPM status page
+; Secure this location in your web server configuration
+pm.status_path = ${statusPath}`;
     }
+
+    // Add additional recommended settings for high traffic
+    configText += `
+
+; PHP Performance Settings
+; ----------------------
+; Memory settings
+php_admin_value[memory_limit] = ${processSize}M
+
+; Realpath cache optimization - improves file path resolution performance
+php_admin_value[realpath_cache_size] = ${realpathCacheSize}
+php_admin_value[realpath_cache_ttl] = ${realpathCacheTTL}
+
+; OPcache settings for optimal performance
+php_admin_value[opcache.enable] = 1
+php_admin_value[opcache.memory_consumption] = ${opcacheMemory}
+php_admin_value[opcache.interned_strings_buffer] = 16
+php_admin_value[opcache.max_accelerated_files] = 10000
+php_admin_value[opcache.revalidate_freq] = 0
+php_admin_value[opcache.validate_timestamps] = 0
+php_admin_value[opcache.save_comments] = 1
+php_admin_value[opcache.enable_file_override] = 1
+php_admin_value[opcache.huge_code_pages] = 1
+
+; Error handling - production settings
+php_admin_value[display_errors] = Off
+php_admin_value[display_startup_errors] = Off
+php_admin_value[log_errors] = On
+php_admin_value[error_log] = /var/log/php/php-error.log
+
+; Execution limits
+php_admin_value[max_execution_time] = 60
+php_admin_value[max_input_time] = 60
+`;
 
     // Update the hidden textarea for copying
     document.getElementById("copyPasteArea").value = configText.trim();
@@ -286,10 +400,14 @@ pm.max_spare_servers = ${document.getElementById("max-spare").value}`;
     document.getElementById("process-size-val").value = 32;
 
     // Additional PHP-FPM parameters
-    document.getElementById("max-requests").value = 0;
+    document.getElementById("max-requests").value = 500; // Changed from 0 to 500 for high traffic
     document.getElementById("process-idle-timeout").value = 10;
     document.getElementById("max-spawn-rate").value = 32;
     document.getElementById("status-path").value = "/status";
+
+    // Reset to dynamic mode by default
+    pmMode = "dynamic";
+    updatePmModeUI();
   }
 
   // Load saved pools from localStorage
@@ -321,6 +439,120 @@ pm.max_spare_servers = ${document.getElementById("max-spare").value}`;
     }
 
     return false;
+  }
+
+  // Add PM mode toggle button to the UI if it doesn't exist
+  function createPmModeToggle() {
+    // Check if we already have a PM mode selector
+    if (!document.getElementById("pm-mode-container")) {
+      // Find a good place to insert the toggle
+      const additionalParamsSection = document.querySelector(
+        ".bg-gray-50.p-4.rounded-md.border.border-gray-200"
+      );
+
+      if (additionalParamsSection) {
+        // Create the toggle element
+        const pmModeContainer = document.createElement("div");
+        pmModeContainer.id = "pm-mode-container";
+        pmModeContainer.className = "mb-4";
+
+        pmModeContainer.innerHTML = `
+          <h4 class="text-lg font-bold text-gray-800 mb-2">Process Manager Mode</h4>
+          <div class="flex space-x-4">
+            <label class="inline-flex items-center">
+              <input type="radio" name="pm-mode" value="dynamic" class="mr-2" ${
+                pmMode === "dynamic" ? "checked" : ""
+              }>
+              <span>Dynamic (variable load)</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input type="radio" name="pm-mode" value="static" class="mr-2" ${
+                pmMode === "static" ? "checked" : ""
+              }>
+              <span>Static (high performance)</span>
+            </label>
+          </div>
+          <p class="text-sm text-gray-600 mt-1">Static mode provides better performance but uses more resources.</p>
+        `;
+
+        // Insert before the additional params section
+        additionalParamsSection.parentNode.insertBefore(
+          pmModeContainer,
+          additionalParamsSection
+        );
+
+        // Add event listeners to the radio buttons
+        const radios = pmModeContainer.querySelectorAll('input[type="radio"]');
+        radios.forEach((radio) => {
+          radio.addEventListener("change", function () {
+            togglePmMode(this.value);
+          });
+        });
+      }
+    }
+  }
+
+  // Add new FAQ items related to PHP optimization
+  function addOptimizationFAQs() {
+    const faqAccordion = document.getElementById("faqAccordion");
+
+    if (faqAccordion) {
+      // Create new FAQ items
+      const newFAQs = [
+        {
+          question:
+            "What is the difference between dynamic and static PM modes?",
+          answer:
+            "Dynamic mode adjusts the number of PHP-FPM processes based on demand, which is good for variable traffic. Static mode maintains a fixed number of processes at all times, providing better performance for high-traffic sites at the cost of higher resource usage.",
+        },
+        {
+          question: "What is realpath_cache and why is it important?",
+          answer:
+            "The realpath cache stores the real file paths of files that PHP opens, avoiding the need for repeated file system lookups. Properly sizing this cache significantly improves performance, especially for applications with many included files like WordPress or frameworks.",
+        },
+        {
+          question: "Why is OPcache important for PHP performance?",
+          answer:
+            "OPcache improves PHP performance by storing precompiled script bytecode in memory, eliminating the need for PHP to load and parse scripts on each request. This can result in a 30-70% performance improvement depending on your application.",
+        },
+        {
+          question: "How does pm.max_requests help with memory leaks?",
+          answer:
+            "The pm.max_requests setting defines the number of requests each child process should execute before respawning. This helps mitigate memory leaks in PHP applications by periodically refreshing processes, preventing them from growing too large over time.",
+        },
+        {
+          question:
+            "Should I set memory_limit to the same value as process size?",
+          answer:
+            "Yes, it's good practice to set the memory_limit to match your estimated process size. This ensures PHP processes don't use more memory than you've planned for in your calculations, preventing potential server instability.",
+        },
+      ];
+
+      // Add the new FAQs to the accordion
+      newFAQs.forEach((faq) => {
+        const faqItem = document.createElement("div");
+        faqItem.className =
+          "faq-item border border-gray-200 rounded-md overflow-hidden";
+
+        faqItem.innerHTML = `
+          <button class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+            <span>${faq.question}</span>
+            <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+            <p class="text-gray-600">${faq.answer}</p>
+          </div>
+        `;
+
+        faqAccordion.appendChild(faqItem);
+      });
+
+      // Re-initialize FAQ accordion after adding new FAQs
+      initFaqAccordion();
+    }
   }
 
   // Add event listeners to sliders and inputs
@@ -388,28 +620,44 @@ pm.max_spare_servers = ${document.getElementById("max-spare").value}`;
   // First try to load saved settings for default pool
   loadSettings(currentPool);
 
+  // Add PM mode toggle to the UI
+  createPmModeToggle();
+
+  // Add new FAQs about optimization
+  addOptimizationFAQs();
+
   // Initial calculation on page load
   updateFields();
 
-  // FAQ Accordion functionality
-  const faqQuestions = document.querySelectorAll(".faq-question");
+  // FAQ Accordion functionality - Reattach event listeners to all FAQ questions
+  function initFaqAccordion() {
+    const faqQuestions = document.querySelectorAll(".faq-question");
 
-  faqQuestions.forEach((question) => {
-    question.addEventListener("click", function () {
-      // Toggle the active class on the question
-      this.classList.toggle("active");
+    faqQuestions.forEach((question) => {
+      // Remove any existing event listeners first to prevent duplicates
+      const questionClone = question.cloneNode(true);
+      question.parentNode.replaceChild(questionClone, question);
 
-      // Find the associated answer
-      const answer = this.nextElementSibling;
+      // Add event listeners to the cloned elements
+      questionClone.addEventListener("click", function () {
+        // Toggle the active class on the question
+        this.classList.toggle("active");
 
-      // Toggle the answer visibility
-      if (answer.classList.contains("hidden")) {
-        answer.classList.remove("hidden");
-        this.querySelector(".faq-arrow").classList.add("rotate-180");
-      } else {
-        answer.classList.add("hidden");
-        this.querySelector(".faq-arrow").classList.remove("rotate-180");
-      }
+        // Find the associated answer
+        const answer = this.nextElementSibling;
+
+        // Toggle the answer visibility
+        if (answer.classList.contains("hidden")) {
+          answer.classList.remove("hidden");
+          this.querySelector(".faq-arrow").classList.add("rotate-180");
+        } else {
+          answer.classList.add("hidden");
+          this.querySelector(".faq-arrow").classList.remove("rotate-180");
+        }
+      });
     });
-  });
+  }
+
+  // Initialize FAQ accordion
+  initFaqAccordion();
 });

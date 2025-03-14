@@ -276,194 +276,280 @@
         </div>
 
         <!-- FAQ Section with Accordion-style Display -->
-        <div class="bg-white shadow-lg rounded-lg p-8 mt-6">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6">FAQ: PHP-FPM Process Calculator</h2>
-
-          <!-- FAQ Accordion -->
-          <div id="faqAccordion" class="space-y-4">
-            <!-- FAQ Item 1 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>What is PHP-FPM?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">PHP-FPM (FastCGI Process Manager) is an alternative PHP FastCGI implementation
-                  with some additional features useful for sites of any size, especially busier sites.</p>
-              </div>
+      <!-- FAQ Section with Accordion-style Display -->
+      <div class="bg-white shadow-lg rounded-lg p-8 mt-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">FAQ: PHP-FPM Process Calculator</h2>
+      
+        <!-- FAQ Accordion -->
+        <div id="faqAccordion" class="space-y-4">
+          <!-- FAQ Item 1 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>What is PHP-FPM?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">PHP-FPM (FastCGI Process Manager) is an alternative PHP FastCGI implementation
+                with some additional features useful for sites of any size, especially busier sites.</p>
             </div>
-          
-            <!-- FAQ Item 2 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>Why is process calculation important?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">Proper process calculation ensures optimal use of server resources, improves
-                  performance, and prevents issues like memory exhaustion.</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 2 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>Why is process calculation important?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">Proper process calculation ensures optimal use of server resources, improves
+                performance, and prevents issues like memory exhaustion.</p>
             </div>
-          
-            <!-- FAQ Item 3 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>How do I implement these settings?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">These settings can be applied in your php-fpm.conf file or the pool
-                  configuration file, typically located in /etc/php/8.x/fpm/pool.d/www.conf (path may vary based on your
-                  setup).</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 3 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>How do I implement these settings?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">These settings can be applied in your php-fpm.conf file or the pool
+                configuration file, typically located in /etc/php/8.x/fpm/pool.d/www.conf (path may vary based on your
+                setup).</p>
             </div>
-          
-            <!-- FAQ Item 4 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>What if my site's traffic fluctuates?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">Consider using the dynamic pm mode, which allows PHP-FPM to adjust the number
-                  of child processes based on the current load.</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 4 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>What if my site's traffic fluctuates?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">Consider using the dynamic pm mode, which allows PHP-FPM to adjust the number
+                of child processes based on the current load.</p>
             </div>
-          
-            <!-- FAQ Item 5 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>Can I use these settings for all environments?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">While these calculations provide an excellent starting point, it's important to
-                  test and adjust based on your specific environment and application needs.</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 5 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>Can I use these settings for all environments?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">While these calculations provide an excellent starting point, it's important to
+                test and adjust based on your specific environment and application needs.</p>
             </div>
-          
-            <!-- FAQ Item 6 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>What does 'pm.max_children' represent?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">pm.max_children sets the maximum number of child processes that can be created
-                  to serve requests. It's crucial for controlling server resource usage.</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 6 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>What does 'pm.max_children' represent?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">pm.max_children sets the maximum number of child processes that can be created
+                to serve requests. It's crucial for controlling server resource usage.</p>
             </div>
-          
-            <!-- FAQ Item 7 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>How do 'pm.start_servers', 'pm.min_spare_servers', and 'pm.max_spare_servers' work
-                  together?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">These settings work together to manage the number of idle processes.
-                  pm.start_servers sets the number of child processes created on startup, while pm.min_spare_servers and
-                  pm.max_spare_servers define the minimum and maximum number of idle child processes.</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 7 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>How do 'pm.start_servers', 'pm.min_spare_servers', and 'pm.max_spare_servers' work
+                together?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">These settings work together to manage the number of idle processes.
+                pm.start_servers sets the number of child processes created on startup, while pm.min_spare_servers and
+                pm.max_spare_servers define the minimum and maximum number of idle child processes.</p>
             </div>
-          
-            <!-- FAQ Item 8 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>What is the significance of the RAM buffer?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">The RAM buffer is a safety margin to prevent your server from using all
-                  available RAM. It helps ensure system stability and provides room for other OS/processes.</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 8 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>What is the significance of the RAM buffer?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">The RAM buffer is a safety margin to prevent your server from using all
+                available RAM. It helps ensure system stability and provides room for other OS/processes.</p>
             </div>
-          
-            <!-- FAQ Item 9 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>How often should I review and adjust these settings?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">It's recommended to review your PHP-FPM settings regularly, especially after
-                  significant changes in traffic patterns or server resources. Monthly or quarterly reviews are common
-                  practices.</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 9 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>How often should I review and adjust these settings?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">It's recommended to review your PHP-FPM settings regularly, especially after
+                significant changes in traffic patterns or server resources. Monthly or quarterly reviews are common
+                practices.</p>
             </div>
-          
-            <!-- FAQ Item 10 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>Can this calculator be used for other server configurations besides PHP-FPM?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">While this calculator is specifically designed for PHP-FPM, the general
-                  principles of resource allocation can be applied to other server configurations. However, the specific
-                  settings and terminologies may differ.</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 10 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>Can this calculator be used for other server configurations besides PHP-FPM?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">While this calculator is specifically designed for PHP-FPM, the general
+                principles of resource allocation can be applied to other server configurations. However, the specific
+                settings and terminologies may differ.</p>
             </div>
-          
-            <!-- FAQ Item 11 -->
-            <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
-              <button
-                class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-                <span>How does PHP-FPM differ from traditional PHP CGI?</span>
-                <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-                <p class="text-gray-600">PHP-FPM offers better performance and more granular control over process
-                  management compared to traditional PHP CGI. It allows for better resource utilization and can handle
-                  high-traffic situations more efficiently.</p>
-              </div>
+          </div>
+      
+          <!-- FAQ Item 11 -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>How does PHP-FPM differ from traditional PHP CGI?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">PHP-FPM offers better performance and more granular control over process
+                management compared to traditional PHP CGI. It allows for better resource utilization and can handle
+                high-traffic situations more efficiently.</p>
+            </div>
+          </div>
+      
+          <!-- FAQ Item 12 - NEW -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>What is the difference between dynamic and static PM modes?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">Dynamic mode adjusts the number of PHP-FPM processes based on demand, which is good for
+                variable traffic. Static mode maintains a fixed number of processes at all times, providing better performance
+                for high-traffic sites at the cost of higher resource usage.</p>
+            </div>
+          </div>
+      
+          <!-- FAQ Item 13 - NEW -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>What is realpath_cache and why is it important?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">The realpath cache stores the real file paths of files that PHP opens, avoiding the
+                need for repeated file system lookups. Properly sizing this cache significantly improves performance,
+                especially for applications with many included files like WordPress or frameworks.</p>
+            </div>
+          </div>
+      
+          <!-- FAQ Item 14 - NEW -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>Why is OPcache important for PHP performance?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">OPcache improves PHP performance by storing precompiled script bytecode in memory,
+                eliminating the need for PHP to load and parse scripts on each request. This can result in a 30-70%
+                performance improvement depending on your application.</p>
+            </div>
+          </div>
+      
+          <!-- FAQ Item 15 - NEW -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>How does pm.max_requests help with memory leaks?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">The pm.max_requests setting defines the number of requests each child process should
+                execute before respawning. This helps mitigate memory leaks in PHP applications by periodically refreshing
+                processes, preventing them from growing too large over time.</p>
+            </div>
+          </div>
+      
+          <!-- FAQ Item 16 - NEW -->
+          <div class="faq-item border border-gray-200 rounded-md overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
+              <span>Should I set memory_limit to the same value as process size?</span>
+              <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
+              <p class="text-gray-600">Yes, it's good practice to set the memory_limit to match your estimated process size.
+                This ensures PHP processes don't use more memory than you've planned for in your calculations, preventing
+                potential server instability.</p>
             </div>
           </div>
         </div>
+      </div>
 
       </div>
       <div class="w-full md:w-1/3 px-3">
