@@ -123,6 +123,33 @@ document.addEventListener("DOMContentLoaded", function () {
     updateFields();
   }
 
+  // Calculate optimal realpath_cache settings based on server size and available RAM
+  // Implementation based on recommendations from: https://linuxblog.io/set-monitor-phps-realpath_cache_size-correctly/
+  function calculateOptimalRealpathCache(processSize, availableRamMb) {
+    // First establish a baseline based on process size (correlates with application complexity)
+    let baseCacheSize = Math.min(
+      4096,
+      Math.max(256, Math.floor(processSize * 2))
+    );
+
+    // Scale based on available RAM
+    if (availableRamMb > 8192) {
+      // More than 8GB RAM available
+      baseCacheSize = Math.max(baseCacheSize, 4096); // At least 4MB
+    } else if (availableRamMb > 4096) {
+      // More than 4GB RAM available
+      baseCacheSize = Math.max(baseCacheSize, 2048); // At least 2MB
+    } else if (availableRamMb > 2048) {
+      // More than 2GB RAM available
+      baseCacheSize = Math.max(baseCacheSize, 1024); // At least 1MB
+    }
+
+    return {
+      realpathCacheSize: baseCacheSize + "k",
+      realpathCacheTTL: 120, // 2 minutes as recommended in the article
+    };
+  }
+
   // Improved calculation function based on high traffic optimization guidelines
   function updateFields() {
     let ramTotal = parseFloat(document.getElementById("ram-total").value);
@@ -175,6 +202,19 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("min-spare").value = minSpare;
     document.getElementById("max-spare").value = maxSpare;
 
+    // Update realpath cache fields if they exist
+    const realpathCacheSizeField = document.getElementById(
+      "realpath-cache-size"
+    );
+    const realpathCacheTtlField = document.getElementById("realpath-cache-ttl");
+
+    if (realpathCacheSizeField && realpathCacheTtlField) {
+      const { realpathCacheSize, realpathCacheTTL } =
+        calculateOptimalRealpathCache(processSize, availableRamMb);
+      realpathCacheSizeField.value = realpathCacheSize;
+      realpathCacheTtlField.value = realpathCacheTTL;
+    }
+
     // Generate configuration text for copy/paste
     generateConfigCopy();
 
@@ -193,12 +233,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const statusPath = document.getElementById("status-path").value;
     const processSize = document.getElementById("process-size").value;
 
-    // Calculate optimal realpath_cache settings based on server size
-    // For larger servers, increase the cache size
-    const realpathCacheSize =
-      Math.min(4096, Math.max(256, Math.floor(parseInt(processSize) * 2))) +
-      "k";
-    const realpathCacheTTL = 120; // 2 minutes is a good default
+    // Get available RAM to better calculate optimal realpath_cache settings
+    const availableRamMb = parseInt(
+      document.getElementById("ram-available-mb").value || 0
+    );
+
+    // Get optimal realpath cache settings
+    const { realpathCacheSize, realpathCacheTTL } =
+      calculateOptimalRealpathCache(parseInt(processSize), availableRamMb);
 
     // Calculate optimal OPcache settings
     const opcacheMemory = Math.min(
@@ -270,8 +312,9 @@ pm.status_path = ${statusPath}`;
 php_admin_value[memory_limit] = ${processSize}M
 
 ; Realpath cache optimization - improves file path resolution performance
-php_admin_value[realpath_cache_size] = ${realpathCacheSize}
-php_admin_value[realpath_cache_ttl] = ${realpathCacheTTL}
+; Optimized based on recommendations from: https://linuxblog.io/set-monitor-phps-realpath_cache_size-correctly/
+php_admin_value[realpath_cache_size] = ${realpathCacheSize}  ; Optimized for ${availableRamMb}MB available RAM
+php_admin_value[realpath_cache_ttl] = ${realpathCacheTTL}    ; 2 minutes is optimal for most sites
 
 ; OPcache settings for optimal performance
 php_admin_value[opcache.enable] = 1
@@ -492,6 +535,66 @@ php_admin_value[max_input_time] = 60
     }
   }
 
+  // Function to add realpath cache section to the UI
+  function addRealpathCacheSection() {
+    // Find a good place to insert the realpath cache section
+    const phpfpmSettings = document.querySelector(
+      ".border-l-4.border-green-500.bg-green-50"
+    );
+
+    if (phpfpmSettings) {
+      // Create the realpath cache section
+      const realpathSection = document.createElement("div");
+      realpathSection.className = "mb-8";
+      realpathSection.innerHTML = `
+        <div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-md">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Realpath Cache Settings</h3>
+          <p class="text-sm text-gray-600 mb-4">
+            The realpath cache stores file paths that PHP accesses, improving performance by avoiding repeated filesystem lookups.
+            Values are automatically optimized based on your server configuration.
+          </p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="realpath-cache-size" class="block text-sm font-medium text-gray-600 mb-1">
+                realpath_cache_size
+              </label>
+              <input id="realpath-cache-size" type="text" readonly 
+                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 font-bold text-blue-800">
+            </div>
+            
+            <div>
+              <label for="realpath-cache-ttl" class="block text-sm font-medium text-gray-600 mb-1">
+                realpath_cache_ttl
+              </label>
+              <input id="realpath-cache-ttl" type="text" readonly 
+                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 font-bold text-blue-800">
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Insert the realpath cache section after the PHP-FPM Settings section
+      phpfpmSettings.parentNode.insertBefore(
+        realpathSection,
+        phpfpmSettings.nextSibling
+      );
+
+      // Initialize the values
+      const availableRamMb = parseInt(
+        document.getElementById("ram-available-mb").value || 0
+      );
+      const processSize = parseFloat(
+        document.getElementById("process-size").value
+      );
+      const { realpathCacheSize, realpathCacheTTL } =
+        calculateOptimalRealpathCache(processSize, availableRamMb);
+
+      document.getElementById("realpath-cache-size").value = realpathCacheSize;
+      document.getElementById("realpath-cache-ttl").value = realpathCacheTTL;
+    }
+  }
+
   // Add new FAQ items related to PHP optimization
   function addOptimizationFAQs() {
     const faqAccordion = document.getElementById("faqAccordion");
@@ -499,6 +602,11 @@ php_admin_value[max_input_time] = 60
     if (faqAccordion) {
       // Create new FAQ items
       const newFAQs = [
+        {
+          question: "What is realpath_cache_size and why is it important?",
+          answer:
+            "The realpath_cache stores the resolved file paths that PHP accesses, avoiding repeated file system lookups. This significantly improves performance, especially for applications with many included files (like WordPress or any framework). According to the Linux Blog, properly sizing this cache can lead to 10-30% performance improvements. Our calculator automatically recommends an optimal setting based on your RAM and process size.",
+        },
         {
           question:
             "What is the difference between dynamic and static PM modes?",
@@ -622,6 +730,9 @@ php_admin_value[max_input_time] = 60
 
   // Add PM mode toggle to the UI
   createPmModeToggle();
+
+  // Add realpath cache section to the UI
+  addRealpathCacheSection();
 
   // Add new FAQs about optimization
   addOptimizationFAQs();
