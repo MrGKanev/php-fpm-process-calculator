@@ -14,8 +14,10 @@ document.addEventListener("DOMContentLoaded", function () {
   function initDarkMode() {
     if (darkMode) {
       document.documentElement.classList.add("dark");
+      updateDarkModeButton(true);
     } else {
       document.documentElement.classList.remove("dark");
+      updateDarkModeButton(false);
     }
   }
 
@@ -26,8 +28,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (darkMode) {
       document.documentElement.classList.add("dark");
+      updateDarkModeButton(true);
     } else {
       document.documentElement.classList.remove("dark");
+      updateDarkModeButton(false);
+    }
+  }
+
+  // Update dark mode button text and icons
+  function updateDarkModeButton(isDark) {
+    const darkModeText = document.getElementById("dark-mode-text");
+    if (darkModeText) {
+      darkModeText.textContent = isDark ? "Light Mode" : "Dark Mode";
     }
   }
 
@@ -256,28 +268,38 @@ document.addEventListener("DOMContentLoaded", function () {
   // Calculate memory leak impact
   // Estimates time until server runs out of memory with typical memory leak
   function calculateMemoryLeakImpact(maxChildren, availableRamMb) {
+    // Ensure we have valid inputs
+    if (!maxChildren || maxChildren <= 0 || !availableRamMb || availableRamMb <= 0) {
+      return "N/A";
+    }
+
     // Assume 1MB per hour per process memory leak (conservative estimate)
     const leakRateMbPerHour = maxChildren * 1;
     const hoursUntilFull = availableRamMb / leakRateMbPerHour;
 
     if (hoursUntilFull < 24) {
-      return `${Math.round(hoursUntilFull)} hours`;
+      return `~${Math.round(hoursUntilFull)} hours`;
     } else {
-      return `${Math.round(hoursUntilFull / 24)} days`;
+      return `~${Math.round(hoursUntilFull / 24)} days`;
     }
   }
 
   // Calculate burst traffic capacity
   // Maximum requests per second the configuration can handle
   function calculateBurstCapacity(maxChildren) {
+    // Ensure we have valid inputs
+    if (!maxChildren || maxChildren <= 0) {
+      return "N/A";
+    }
+
     // Assuming average PHP script execution time of 100ms
     // Each process can handle 10 requests per second
     const requestsPerSecond = maxChildren * 10;
 
     if (requestsPerSecond < 1000) {
-      return `${requestsPerSecond} req/s`;
+      return `~${requestsPerSecond} req/s`;
     } else {
-      return `${(requestsPerSecond / 1000).toFixed(1)}k req/s`;
+      return `~${(requestsPerSecond / 1000).toFixed(1)}k req/s`;
     }
   }
 
