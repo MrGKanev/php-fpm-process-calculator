@@ -2,11 +2,37 @@ document.addEventListener("DOMContentLoaded", function () {
   // Constants for localStorage
   const STORAGE_KEY_PREFIX = "phpFpmCalculatorSettings_";
   const DEFAULT_POOL = "www";
+  const DARK_MODE_KEY = "phpFpmCalculatorDarkMode";
 
   // Data structure for storing pool configurations
   let pools = {};
   let currentPool = DEFAULT_POOL;
   let pmMode = "dynamic"; // Default PM mode
+  let darkMode = localStorage.getItem(DARK_MODE_KEY) === "true";
+
+  // Initialize dark mode
+  function initDarkMode() {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }
+
+  // Toggle dark mode
+  function toggleDarkMode() {
+    darkMode = !darkMode;
+    localStorage.setItem(DARK_MODE_KEY, darkMode.toString());
+
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }
+
+  // Apply dark mode on load
+  initDarkMode();
 
   // Function to get storage key for a specific pool
   function getStorageKey(poolName) {
@@ -24,6 +50,75 @@ document.addEventListener("DOMContentLoaded", function () {
       validateInput(this);
     });
   });
+
+  // Validation warnings system
+  function validateConfiguration(ramTotal, ramReserved, ramBuffer, processSize, maxChildren) {
+    const warnings = [];
+    const availableRam = ramTotal - ramReserved;
+
+    // Warning: Reserved RAM is too high
+    if (ramReserved / ramTotal > 0.5) {
+      warnings.push("Reserved RAM is more than 50% of total RAM. This may leave too little memory for PHP-FPM processes.");
+    }
+
+    // Warning: RAM buffer is too low
+    if (ramBuffer < 5) {
+      warnings.push("RAM buffer is below 5%. Consider leaving more headroom for system stability.");
+    }
+
+    // Warning: RAM buffer is too high
+    if (ramBuffer > 30) {
+      warnings.push("RAM buffer is above 30%. You may be underutilizing your server resources.");
+    }
+
+    // Warning: Process size seems too small
+    if (processSize < 16) {
+      warnings.push("Process size below 16MB is unusual for PHP applications. Verify this is correct.");
+    }
+
+    // Warning: Process size seems very large
+    if (processSize > 256) {
+      warnings.push("Process size above 256MB is very high. This may indicate memory leaks or inefficient code.");
+    }
+
+    // Warning: Too few max_children
+    if (maxChildren < 5) {
+      warnings.push("Less than 5 max_children may not handle traffic spikes well. Consider increasing RAM or reducing process size.");
+    }
+
+    // Warning: Available RAM is very low
+    if (availableRam < 1) {
+      warnings.push("Less than 1GB available RAM is very tight. Consider increasing total RAM or reducing reserved RAM.");
+    }
+
+    // Warning: Too many processes for RAM
+    const estimatedMemoryUsage = (maxChildren * processSize) / 1024;
+    if (estimatedMemoryUsage > availableRam * 0.9) {
+      warnings.push("Estimated memory usage exceeds 90% of available RAM. Risk of out-of-memory errors.");
+    }
+
+    return warnings;
+  }
+
+  // Display warnings in UI
+  function displayWarnings(warnings) {
+    const warningContainer = document.getElementById("warning-container");
+    const warningList = document.querySelector("#warning-list ul");
+
+    if (warnings.length === 0) {
+      warningContainer.classList.add("hidden");
+      return;
+    }
+
+    warningContainer.classList.remove("hidden");
+    warningList.innerHTML = "";
+
+    warnings.forEach(warning => {
+      const li = document.createElement("li");
+      li.textContent = warning;
+      warningList.appendChild(li);
+    });
+  }
 
   // Save current settings to localStorage
   function saveSettings() {
@@ -150,6 +245,42 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
+  // Calculate estimated concurrent users
+  // Assuming 1 request per user with average 1 second response time
+  function calculateConcurrentUsers(maxChildren) {
+    // Conservative estimate: each process handles 1 request
+    // With 1 second average response time, maxChildren = concurrent users
+    return maxChildren;
+  }
+
+  // Calculate memory leak impact
+  // Estimates time until server runs out of memory with typical memory leak
+  function calculateMemoryLeakImpact(maxChildren, availableRamMb) {
+    // Assume 1MB per hour per process memory leak (conservative estimate)
+    const leakRateMbPerHour = maxChildren * 1;
+    const hoursUntilFull = availableRamMb / leakRateMbPerHour;
+
+    if (hoursUntilFull < 24) {
+      return `${Math.round(hoursUntilFull)} hours`;
+    } else {
+      return `${Math.round(hoursUntilFull / 24)} days`;
+    }
+  }
+
+  // Calculate burst traffic capacity
+  // Maximum requests per second the configuration can handle
+  function calculateBurstCapacity(maxChildren) {
+    // Assuming average PHP script execution time of 100ms
+    // Each process can handle 10 requests per second
+    const requestsPerSecond = maxChildren * 10;
+
+    if (requestsPerSecond < 1000) {
+      return `${requestsPerSecond} req/s`;
+    } else {
+      return `${(requestsPerSecond / 1000).toFixed(1)}k req/s`;
+    }
+  }
+
   // Improved calculation function based on high traffic optimization guidelines
   function updateFields() {
     let ramTotal = parseFloat(document.getElementById("ram-total").value);
@@ -214,6 +345,27 @@ document.addEventListener("DOMContentLoaded", function () {
       realpathCacheSizeField.value = realpathCacheSize;
       realpathCacheTtlField.value = realpathCacheTTL;
     }
+
+    // Update advanced calculator fields
+    const concurrentUsersField = document.getElementById("concurrent-users");
+    const memoryLeakImpactField = document.getElementById("memory-leak-impact");
+    const burstCapacityField = document.getElementById("burst-capacity");
+
+    if (concurrentUsersField) {
+      concurrentUsersField.value = calculateConcurrentUsers(maxChildren);
+    }
+
+    if (memoryLeakImpactField) {
+      memoryLeakImpactField.value = calculateMemoryLeakImpact(maxChildren, availableRamMb);
+    }
+
+    if (burstCapacityField) {
+      burstCapacityField.value = calculateBurstCapacity(maxChildren);
+    }
+
+    // Validate configuration and display warnings
+    const warnings = validateConfiguration(ramTotal, ramReserved, ramBuffer, processSize, maxChildren);
+    displayWarnings(warnings);
 
     // Generate configuration text for copy/paste
     generateConfigCopy();
@@ -703,6 +855,90 @@ php_admin_value[max_input_time] = 60
     });
   });
 
+  // Export settings to JSON file
+  function exportSettings() {
+    const allSettings = {};
+
+    // Export all pool settings
+    Object.keys(pools).forEach((poolName) => {
+      const savedSettingsStr = localStorage.getItem(getStorageKey(poolName));
+      if (savedSettingsStr) {
+        allSettings[poolName] = JSON.parse(savedSettingsStr);
+      }
+    });
+
+    // Create export data
+    const exportData = {
+      version: "1.2.0",
+      exportDate: new Date().toISOString(),
+      pools: allSettings,
+      currentPool: currentPool
+    };
+
+    // Create blob and download
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `php-fpm-settings-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // Import settings from JSON file
+  function importSettings(file) {
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      try {
+        const importData = JSON.parse(e.target.result);
+
+        // Validate import data
+        if (!importData.pools) {
+          alert("Invalid settings file format");
+          return;
+        }
+
+        // Import all pool settings
+        Object.keys(importData.pools).forEach((poolName) => {
+          pools[poolName] = true;
+          localStorage.setItem(getStorageKey(poolName), JSON.stringify(importData.pools[poolName]));
+
+          // Add to dropdown if not exists
+          const poolSelect = document.getElementById("current-pool");
+          const existingOption = Array.from(poolSelect.options).find(opt => opt.value === poolName);
+
+          if (!existingOption && poolName !== DEFAULT_POOL) {
+            const option = document.createElement("option");
+            option.value = poolName;
+            option.textContent = poolName;
+            poolSelect.appendChild(option);
+          }
+        });
+
+        // Save pools list
+        localStorage.setItem(
+          STORAGE_KEY_PREFIX + "pools",
+          JSON.stringify(Object.keys(pools))
+        );
+
+        // Switch to imported current pool or first pool
+        const targetPool = importData.currentPool || Object.keys(pools)[0];
+        document.getElementById("current-pool").value = targetPool;
+        switchPool(targetPool);
+
+        alert("Settings imported successfully!");
+      } catch (error) {
+        console.error("Import error:", error);
+        alert("Failed to import settings. Please check the file format.");
+      }
+    };
+
+    reader.readAsText(file);
+  }
+
   // Pool management event listeners
   document.getElementById("add-pool").addEventListener("click", addNewPool);
   document
@@ -714,10 +950,26 @@ php_admin_value[max_input_time] = 60
       switchPool(this.value);
     });
 
+  // Export/Import event listeners
+  document.getElementById("export-settings").addEventListener("click", exportSettings);
+  document.getElementById("import-settings").addEventListener("click", function() {
+    document.getElementById("import-file").click();
+  });
+  document.getElementById("import-file").addEventListener("change", function(e) {
+    if (e.target.files.length > 0) {
+      importSettings(e.target.files[0]);
+      // Reset file input
+      e.target.value = "";
+    }
+  });
+
   // Copy button event listener
   document
     .getElementById("buttonCopy")
     .addEventListener("click", copyToClipboard);
+
+  // Dark mode toggle event listener
+  document.getElementById("dark-mode-toggle").addEventListener("click", toggleDarkMode);
 
   // Initialize pools object with default pool
   pools[DEFAULT_POOL] = true;

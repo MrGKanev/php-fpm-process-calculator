@@ -1,5 +1,27 @@
 {
+  "name": "php-fpm-process-calculator",
+  "version": "1.2.0",
+  "description": "PHP-FPM Process Calculator for optimizing PHP pool settings and Nginx configurations",
+  "scripts": {
+    "build": "npx @tailwindcss/cli -i ./assets/style.css -o ./assets/style.min.css --minify",
+    "watch": "npx @tailwindcss/cli -i ./assets/style.css -o ./assets/style.min.css --watch",
+    "dev": "npm run watch",
+    "lint": "eslint assets/*.js",
+    "lint:fix": "eslint assets/*.js --fix",
+    "format": "prettier --write \"**/*.{js,html,css,md,json}\"",
+    "format:check": "prettier --check \"**/*.{js,html,css,md,json}\""
+  },
+  "keywords": [
+    "php-fpm",
+    "nginx",
+    "server-optimization",
+    "calculator"
+  ],
+  "author": "Gabriel Kanev",
+  "license": "MIT",
   "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
     "tailwindcss": "^4.0.12"
   }
 }
