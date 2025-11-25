@@ -2,11 +2,37 @@ document.addEventListener("DOMContentLoaded", function () {
   // Constants for localStorage
   const STORAGE_KEY_PREFIX = "phpFpmCalculatorSettings_";
   const DEFAULT_POOL = "www";
+  const DARK_MODE_KEY = "phpFpmCalculatorDarkMode";
 
   // Data structure for storing pool configurations
   let pools = {};
   let currentPool = DEFAULT_POOL;
   let pmMode = "dynamic"; // Default PM mode
+  let darkMode = localStorage.getItem(DARK_MODE_KEY) === "true";
+
+  // Initialize dark mode
+  function initDarkMode() {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }
+
+  // Toggle dark mode
+  function toggleDarkMode() {
+    darkMode = !darkMode;
+    localStorage.setItem(DARK_MODE_KEY, darkMode.toString());
+
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }
+
+  // Apply dark mode on load
+  initDarkMode();
 
   // Function to get storage key for a specific pool
   function getStorageKey(poolName) {
@@ -703,6 +729,90 @@ php_admin_value[max_input_time] = 60
     });
   });
 
+  // Export settings to JSON file
+  function exportSettings() {
+    const allSettings = {};
+
+    // Export all pool settings
+    Object.keys(pools).forEach((poolName) => {
+      const savedSettingsStr = localStorage.getItem(getStorageKey(poolName));
+      if (savedSettingsStr) {
+        allSettings[poolName] = JSON.parse(savedSettingsStr);
+      }
+    });
+
+    // Create export data
+    const exportData = {
+      version: "1.2.0",
+      exportDate: new Date().toISOString(),
+      pools: allSettings,
+      currentPool: currentPool
+    };
+
+    // Create blob and download
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `php-fpm-settings-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // Import settings from JSON file
+  function importSettings(file) {
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      try {
+        const importData = JSON.parse(e.target.result);
+
+        // Validate import data
+        if (!importData.pools) {
+          alert("Invalid settings file format");
+          return;
+        }
+
+        // Import all pool settings
+        Object.keys(importData.pools).forEach((poolName) => {
+          pools[poolName] = true;
+          localStorage.setItem(getStorageKey(poolName), JSON.stringify(importData.pools[poolName]));
+
+          // Add to dropdown if not exists
+          const poolSelect = document.getElementById("current-pool");
+          const existingOption = Array.from(poolSelect.options).find(opt => opt.value === poolName);
+
+          if (!existingOption && poolName !== DEFAULT_POOL) {
+            const option = document.createElement("option");
+            option.value = poolName;
+            option.textContent = poolName;
+            poolSelect.appendChild(option);
+          }
+        });
+
+        // Save pools list
+        localStorage.setItem(
+          STORAGE_KEY_PREFIX + "pools",
+          JSON.stringify(Object.keys(pools))
+        );
+
+        // Switch to imported current pool or first pool
+        const targetPool = importData.currentPool || Object.keys(pools)[0];
+        document.getElementById("current-pool").value = targetPool;
+        switchPool(targetPool);
+
+        alert("Settings imported successfully!");
+      } catch (error) {
+        console.error("Import error:", error);
+        alert("Failed to import settings. Please check the file format.");
+      }
+    };
+
+    reader.readAsText(file);
+  }
+
   // Pool management event listeners
   document.getElementById("add-pool").addEventListener("click", addNewPool);
   document
@@ -714,10 +824,26 @@ php_admin_value[max_input_time] = 60
       switchPool(this.value);
     });
 
+  // Export/Import event listeners
+  document.getElementById("export-settings").addEventListener("click", exportSettings);
+  document.getElementById("import-settings").addEventListener("click", function() {
+    document.getElementById("import-file").click();
+  });
+  document.getElementById("import-file").addEventListener("change", function(e) {
+    if (e.target.files.length > 0) {
+      importSettings(e.target.files[0]);
+      // Reset file input
+      e.target.value = "";
+    }
+  });
+
   // Copy button event listener
   document
     .getElementById("buttonCopy")
     .addEventListener("click", copyToClipboard);
+
+  // Dark mode toggle event listener
+  document.getElementById("dark-mode-toggle").addEventListener("click", toggleDarkMode);
 
   // Initialize pools object with default pool
   pools[DEFAULT_POOL] = true;

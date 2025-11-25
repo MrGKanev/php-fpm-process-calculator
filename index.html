@@ -4,39 +4,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description"
-    content="PHP-FPM Process Calculator for optimizing PHP pool settings and Nginx configurations">
-  <meta name="keywords" content="PHP, PHP-FPM, Nginx, Process Calculator, Server Optimization, RAM, Tutorials">
+
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="PHP-FPM Process Calculator for optimizing PHP pool settings and Nginx configurations. Calculate optimal pm.max_children, pm.start_servers, and other PHP-FPM settings based on your server's RAM.">
+  <meta name="keywords" content="PHP, PHP-FPM, Nginx, Process Calculator, Server Optimization, RAM, Tutorials, pm.max_children, OPcache, realpath_cache">
   <meta name="author" content="Gabriel Kanev">
-  <title>PHP-FPM Process Calculator</title>
-  <!-- Updated to use direct link to CSS file instead of relative path -->
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://mrgkanev.github.io/php-fpm-process-calculator/">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="PHP-FPM Process Calculator - Optimize Your Server">
+  <meta property="og:description" content="Calculate optimal PHP-FPM pool settings based on your server's RAM. Free tool for optimizing PHP performance.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mrgkanev.github.io/php-fpm-process-calculator/">
+  <meta property="og:site_name" content="PHP-FPM Process Calculator">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PHP-FPM Process Calculator">
+  <meta name="twitter:description" content="Calculate optimal PHP-FPM pool settings based on your server's RAM.">
+  <meta name="twitter:creator" content="@MrGKanev">
+
+  <!-- Favicon and App Icons -->
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+  <link rel="apple-touch-icon" href="./assets/icon.svg">
+  <meta name="theme-color" content="#3B82F6" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1E40AF" media="(prefers-color-scheme: dark)">
+
+  <title>PHP-FPM Process Calculator - Optimize Your Server Settings</title>
+
+  <!-- Stylesheet -->
   <link href="./assets/style.min.css" rel="stylesheet" type="text/css">
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 dark:bg-gray-900 transition-colors">
   <div class="container mx-auto p-6">
+    <!-- Dark Mode Toggle -->
+    <div class="flex justify-end mb-4">
+      <button id="dark-mode-toggle" class="px-4 py-2 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 rounded-md transition-colors hover:bg-gray-700 dark:hover:bg-gray-300 flex items-center gap-2">
+        <svg id="icon-sun" class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+        </svg>
+        <svg id="icon-moon" class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+        </svg>
+        <span id="dark-mode-text">Dark Mode</span>
+      </button>
+    </div>
     <div class="flex flex-wrap -mx-3">
       <div class="w-full md:w-2/3 px-3">
         <!-- Pool Management Section -->
-        <div class="bg-white shadow-lg rounded-lg p-8 mb-6">
-          <h2 class="text-2xl font-bold text-gray-800 mb-4">PHP-FPM Pool Management</h2>
-          <div class="flex justify-between items-center mb-4">
-            <div>
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 mb-6">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">PHP-FPM Pool Management</h2>
+          <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+            <div class="flex gap-2">
               <button id="add-pool"
                 class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors">
                 Add New Pool
               </button>
+              <button id="export-settings"
+                class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors">
+                Export Settings
+              </button>
+              <button id="import-settings"
+                class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-md transition-colors">
+                Import Settings
+              </button>
+              <input type="file" id="import-file" accept=".json" class="hidden">
             </div>
             <div>
-              <select id="current-pool" class="px-4 py-2 border border-gray-300 rounded-md">
+              <select id="current-pool" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">
                 <option value="www">www (default)</option>
               </select>
             </div>
           </div>
           <div id="pool-name-container" class="mb-4 hidden">
-            <label for="pool-name" class="block text-sm font-medium text-gray-600 mb-1">Pool Name</label>
+            <label for="pool-name" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Pool Name</label>
             <div class="flex">
-              <input id="pool-name" type="text" class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md">
+              <input id="pool-name" type="text" class="flex-grow px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700 dark:text-white">
               <button id="save-pool-name" class="px-4 py-2 bg-green-500 text-white rounded-r-md flex items-center">
                 Save
               </button>
@@ -44,23 +98,23 @@
           </div>
         </div>
 
-        <div class="bg-white shadow-lg rounded-lg p-8 mb-6" aria-labelledby="calculator-heading">
-          <h1 id="calculator-heading" class="text-3xl font-bold text-gray-800 mb-6 text-center">PHP-FPM Process
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 mb-6" aria-labelledby="calculator-heading">
+          <h1 id="calculator-heading" class="text-3xl font-bold text-gray-800 dark:text-white mb-6 text-center">PHP-FPM Process
             Calculator</h1>
-          <div id="current-pool-name" class="text-lg font-medium text-center mb-4 text-blue-800">
+          <div id="current-pool-name" class="text-lg font-medium text-center mb-4 text-blue-800 dark:text-blue-400">
             Current Pool: www (default)
           </div>
           <form id="calculator-form">
             <!-- Mobile-First Approach for Sliders and Inputs -->
             <div class="mb-8">
               <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
-                <label for="ram-total" class="text-lg font-medium text-gray-700 mb-2 md:mb-0">Total RAM (GB)</label>
+                <label for="ram-total" class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2 md:mb-0">Total RAM (GB)</label>
                 <div class="relative w-full md:w-36 h-10">
                   <input id="ram-total-val" type="number" min="1" max="512" step="1" value="4"
-                    class="absolute top-0 left-0 w-full h-full text-blue-800 text-center border rounded-md pl-4 pr-4"
+                    class="absolute top-0 left-0 w-full h-full text-blue-800 dark:text-blue-400 text-center border dark:border-gray-600 rounded-md pl-4 pr-4 dark:bg-gray-700"
                     aria-labelledby="ram-total-label">
                   <div class="absolute top-0 right-0 bottom-0 flex items-center pr-2 pointer-events-none">
-                    <span class="text-gray-500">GB</span>
+                    <span class="text-gray-500 dark:text-gray-400">GB</span>
                   </div>
                 </div>
               </div>
@@ -123,8 +177,8 @@
 
             <!-- Additional PHP-FPM Parameters -->
             <div class="mb-8">
-              <h3 class="text-lg font-bold text-gray-800 mb-4">Additional PHP-FPM Parameters</h3>
-              <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+              <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Additional PHP-FPM Parameters</h3>
+              <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md border border-gray-200 dark:border-gray-600">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label for="max-requests" class="block text-sm font-medium text-gray-600 mb-1">
@@ -277,8 +331,8 @@
 
         <!-- FAQ Section with Accordion-style Display -->
       <!-- FAQ Section with Accordion-style Display -->
-      <div class="bg-white shadow-lg rounded-lg p-8 mt-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">FAQ: PHP-FPM Process Calculator</h2>
+      <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 mt-6">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">FAQ: PHP-FPM Process Calculator</h2>
       
         <!-- FAQ Accordion -->
         <div id="faqAccordion" class="space-y-4">
@@ -553,8 +607,8 @@
 
       </div>
       <div class="w-full md:w-1/3 px-3">
-        <div class="bg-white shadow-lg rounded-lg p-8 mb-10">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">PHP Tutorials</h2>
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 mb-10">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">PHP Tutorials</h2>
           <ul class="list-disc pl-5 mb-8">
             <li><a href="https://www.php.net/manual/en/" class="text-blue-800">PHP Manual</a></li>
             <li><a href="https://www.w3schools.com/php/" class="text-blue-800">PHP Tutorial on W3Schools</a></li>
@@ -572,7 +626,7 @@
               <li><a href="https://www.inmotionhosting.com" class="text-blue-800">InMotion Hosting</a></li> -->
           </ul>
         </div>
-        <footer class="text-center text-gray-500 text-sm mt-8">
+        <footer class="text-center text-gray-500 dark:text-gray-400 text-sm mt-8">
           © Author <a href="https://gkanev.com" class="text-blue-800">Gabriel Kanev</a>,
           <script>document.write(new Date().getFullYear());</script> | <a
             href="https://github.com/MrGKanev/php-fpm-process-calculator" class="text-blue-800">Check out the source
