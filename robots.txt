@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mrgkanev.github.io/php-fpm-process-calculator/sitemap.xml
+Sitemap: https://php-fpm.gkanev.com/sitemap.xml
