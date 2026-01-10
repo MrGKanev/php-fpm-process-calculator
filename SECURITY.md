@@ -62,6 +62,7 @@ Security updates will be:
 ## Contact
 
 For security concerns, please contact:
+
 - Maintainer: Gabriel Kanev
 - Website: https://gkanev.com
 - Repository: https://github.com/MrGKanev/php-fpm-process-calculator

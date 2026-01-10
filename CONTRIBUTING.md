@@ -20,6 +20,7 @@ If you find a bug or have a suggestion for improvement:
    - Clone your fork locally
 
 2. **Create a Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -31,12 +32,14 @@ If you find a bug or have a suggestion for improvement:
    - Update documentation if needed
 
 4. **Commit Your Changes**
+
    ```bash
    git add .
    git commit -m "Description of your changes"
    ```
 
 5. **Push to Your Fork**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -50,17 +53,20 @@ If you find a bug or have a suggestion for improvement:
 ## Development Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/MrGKanev/php-fpm-process-calculator.git
    cd php-fpm-process-calculator
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Start development server:
+
    ```bash
    npm run dev
    ```
@@ -97,6 +103,7 @@ Before submitting a pull request:
 ## Questions?
 
 If you have questions about contributing, feel free to:
+
 - Open an issue for discussion
 - Contact the maintainer: [Gabriel Kanev](https://gkanev.com)
 

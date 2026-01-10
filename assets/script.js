@@ -8,31 +8,51 @@ document.addEventListener("DOMContentLoaded", function () {
   let pools = {};
   let currentPool = DEFAULT_POOL;
   let pmMode = "dynamic"; // Default PM mode
-  let darkMode = localStorage.getItem(DARK_MODE_KEY) === "true";
 
-  // Initialize dark mode
+  // Scoped timeout variable (not on window)
+  let saveTimeout = null;
+
+  // Initialize dark mode with system preference detection
   function initDarkMode() {
-    if (darkMode) {
+    const savedPreference = localStorage.getItem(DARK_MODE_KEY);
+    let darkMode;
+
+    if (savedPreference !== null) {
+      // Use saved preference
+      darkMode = savedPreference === "true";
+    } else {
+      // Check system preference
+      darkMode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+
+    applyDarkMode(darkMode);
+
+    // Listen for system preference changes
+    if (window.matchMedia) {
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+        // Only auto-switch if user hasn't set a preference
+        if (localStorage.getItem(DARK_MODE_KEY) === null) {
+          applyDarkMode(e.matches);
+        }
+      });
+    }
+  }
+
+  // Apply dark mode state
+  function applyDarkMode(isDark) {
+    if (isDark) {
       document.documentElement.classList.add("dark");
-      updateDarkModeButton(true);
     } else {
       document.documentElement.classList.remove("dark");
-      updateDarkModeButton(false);
     }
+    updateDarkModeButton(isDark);
   }
 
   // Toggle dark mode
   function toggleDarkMode() {
-    darkMode = !darkMode;
-    localStorage.setItem(DARK_MODE_KEY, darkMode.toString());
-
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      updateDarkModeButton(true);
-    } else {
-      document.documentElement.classList.remove("dark");
-      updateDarkModeButton(false);
-    }
+    const isDark = !document.documentElement.classList.contains("dark");
+    localStorage.setItem(DARK_MODE_KEY, isDark.toString());
+    applyDarkMode(isDark);
   }
 
   // Update dark mode button text and icons
@@ -46,6 +66,79 @@ document.addEventListener("DOMContentLoaded", function () {
   // Apply dark mode on load
   initDarkMode();
 
+  // Toast notification system
+  function showToast(message, type = "info") {
+    // Remove existing toast
+    const existingToast = document.getElementById("toast-notification");
+    if (existingToast) {
+      existingToast.remove();
+    }
+
+    const colors = {
+      success: "bg-green-500",
+      error: "bg-red-500",
+      warning: "bg-yellow-500",
+      info: "bg-blue-500",
+    };
+
+    const toast = document.createElement("div");
+    toast.id = "toast-notification";
+    toast.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 transform transition-all duration-300 translate-y-0 opacity-100`;
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "polite");
+
+    // Create icon using DOM methods (safe)
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("class", "w-5 h-5");
+    icon.setAttribute("fill", "currentColor");
+    icon.setAttribute("viewBox", "0 0 20 20");
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    if (type === "success") {
+      path.setAttribute("fill-rule", "evenodd");
+      path.setAttribute("clip-rule", "evenodd");
+      path.setAttribute(
+        "d",
+        "M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+      );
+    } else if (type === "error") {
+      path.setAttribute("fill-rule", "evenodd");
+      path.setAttribute("clip-rule", "evenodd");
+      path.setAttribute(
+        "d",
+        "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+      );
+    } else if (type === "warning") {
+      path.setAttribute("fill-rule", "evenodd");
+      path.setAttribute("clip-rule", "evenodd");
+      path.setAttribute(
+        "d",
+        "M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+      );
+    } else {
+      path.setAttribute("fill-rule", "evenodd");
+      path.setAttribute("clip-rule", "evenodd");
+      path.setAttribute(
+        "d",
+        "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+      );
+    }
+    icon.appendChild(path);
+
+    const text = document.createElement("span");
+    text.textContent = message;
+
+    toast.appendChild(icon);
+    toast.appendChild(text);
+    document.body.appendChild(toast);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      toast.classList.add("translate-y-2", "opacity-0");
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
   // Function to get storage key for a specific pool
   function getStorageKey(poolName) {
     return STORAGE_KEY_PREFIX + poolName;
@@ -56,8 +149,30 @@ document.addEventListener("DOMContentLoaded", function () {
     input.value = input.value.replace(/[^0-9.]/g, "");
   }
 
+  // Validate pool name
+  function validatePoolName(name) {
+    // Only allow alphanumeric, underscore, and hyphen
+    const validPattern = /^[a-zA-Z0-9_-]+$/;
+    if (!name || name.length === 0) {
+      return { valid: false, message: "Pool name cannot be empty" };
+    }
+    if (name.length > 50) {
+      return { valid: false, message: "Pool name is too long (max 50 characters)" };
+    }
+    if (!validPattern.test(name)) {
+      return {
+        valid: false,
+        message: "Pool name can only contain letters, numbers, underscores, and hyphens",
+      };
+    }
+    if (pools[name]) {
+      return { valid: false, message: "A pool with this name already exists" };
+    }
+    return { valid: true };
+  }
+
   // Apply validateInput to all number inputs
-  document.querySelectorAll('input[type="number"]').forEach(function (input) {
+  document.querySelectorAll("input[type=\"number\"]").forEach(function (input) {
     input.addEventListener("input", function () {
       validateInput(this);
     });
@@ -70,7 +185,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Warning: Reserved RAM is too high
     if (ramReserved / ramTotal > 0.5) {
-      warnings.push("Reserved RAM is more than 50% of total RAM. This may leave too little memory for PHP-FPM processes.");
+      warnings.push(
+        "Reserved RAM is more than 50% of total RAM. This may leave too little memory for PHP-FPM processes."
+      );
     }
 
     // Warning: RAM buffer is too low
@@ -85,28 +202,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Warning: Process size seems too small
     if (processSize < 16) {
-      warnings.push("Process size below 16MB is unusual for PHP applications. Verify this is correct.");
+      warnings.push(
+        "Process size below 16MB is unusual for PHP applications. Verify this is correct."
+      );
     }
 
     // Warning: Process size seems very large
     if (processSize > 256) {
-      warnings.push("Process size above 256MB is very high. This may indicate memory leaks or inefficient code.");
+      warnings.push(
+        "Process size above 256MB is very high. This may indicate memory leaks or inefficient code."
+      );
     }
 
     // Warning: Too few max_children
     if (maxChildren < 5) {
-      warnings.push("Less than 5 max_children may not handle traffic spikes well. Consider increasing RAM or reducing process size.");
+      warnings.push(
+        "Less than 5 max_children may not handle traffic spikes well. Consider increasing RAM or reducing process size."
+      );
     }
 
     // Warning: Available RAM is very low
     if (availableRam < 1) {
-      warnings.push("Less than 1GB available RAM is very tight. Consider increasing total RAM or reducing reserved RAM.");
+      warnings.push(
+        "Less than 1GB available RAM is very tight. Consider increasing total RAM or reducing reserved RAM."
+      );
     }
 
     // Warning: Too many processes for RAM
     const estimatedMemoryUsage = (maxChildren * processSize) / 1024;
     if (estimatedMemoryUsage > availableRam * 0.9) {
-      warnings.push("Estimated memory usage exceeds 90% of available RAM. Risk of out-of-memory errors.");
+      warnings.push(
+        "Estimated memory usage exceeds 90% of available RAM. Risk of out-of-memory errors."
+      );
     }
 
     return warnings;
@@ -123,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     warningContainer.classList.remove("hidden");
-    warningList.innerHTML = "";
+    warningList.textContent = ""; // Clear safely
 
     warnings.forEach(warning => {
       const li = document.createElement("li");
@@ -148,15 +275,9 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     try {
-      localStorage.setItem(
-        getStorageKey(currentPool),
-        JSON.stringify(settings)
-      );
+      localStorage.setItem(getStorageKey(currentPool), JSON.stringify(settings));
       // Also save the list of pools
-      localStorage.setItem(
-        STORAGE_KEY_PREFIX + "pools",
-        JSON.stringify(Object.keys(pools))
-      );
+      localStorage.setItem(STORAGE_KEY_PREFIX + "pools", JSON.stringify(Object.keys(pools)));
     } catch (e) {
       console.error("Failed to save settings:", e);
       // Silent failure - localStorage might be disabled or full
@@ -175,29 +296,20 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("ram-total").value = settings.ramTotal || 4;
         document.getElementById("ram-total-val").value = settings.ramTotal || 4;
 
-        document.getElementById("ram-reserved").value =
-          settings.ramReserved || 1;
-        document.getElementById("ram-reserved-val").value =
-          settings.ramReserved || 1;
+        document.getElementById("ram-reserved").value = settings.ramReserved || 1;
+        document.getElementById("ram-reserved-val").value = settings.ramReserved || 1;
 
         document.getElementById("ram-buffer").value = settings.ramBuffer || 10;
-        document.getElementById("ram-buffer-val").value =
-          settings.ramBuffer || 10;
+        document.getElementById("ram-buffer-val").value = settings.ramBuffer || 10;
 
-        document.getElementById("process-size").value =
-          settings.processSize || 32;
-        document.getElementById("process-size-val").value =
-          settings.processSize || 32;
+        document.getElementById("process-size").value = settings.processSize || 32;
+        document.getElementById("process-size-val").value = settings.processSize || 32;
 
         // Additional PHP-FPM parameters
-        document.getElementById("max-requests").value =
-          settings.maxRequests || 0;
-        document.getElementById("process-idle-timeout").value =
-          settings.processIdleTimeout || 10;
-        document.getElementById("max-spawn-rate").value =
-          settings.maxSpawnRate || 32;
-        document.getElementById("status-path").value =
-          settings.statusPath || "/status";
+        document.getElementById("max-requests").value = settings.maxRequests || 0;
+        document.getElementById("process-idle-timeout").value = settings.processIdleTimeout || 10;
+        document.getElementById("max-spawn-rate").value = settings.maxSpawnRate || 32;
+        document.getElementById("status-path").value = settings.statusPath || "/status";
 
         // Load PM mode if available
         if (settings.pmMode) {
@@ -222,6 +334,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (pmModeSelector) {
       pmModeSelector.value = pmMode;
     }
+    // Update radio buttons
+    const radios = document.querySelectorAll("input[name=\"pm-mode\"]");
+    radios.forEach(radio => {
+      radio.checked = radio.value === pmMode;
+    });
   }
 
   // Function to toggle PM mode between dynamic and static
@@ -231,49 +348,34 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Calculate optimal realpath_cache settings based on server size and available RAM
-  // Implementation based on recommendations from: https://linuxblog.io/set-monitor-phps-realpath_cache_size-correctly/
   function calculateOptimalRealpathCache(processSize, availableRamMb) {
-    // First establish a baseline based on process size (correlates with application complexity)
-    let baseCacheSize = Math.min(
-      4096,
-      Math.max(256, Math.floor(processSize * 2))
-    );
+    let baseCacheSize = Math.min(4096, Math.max(256, Math.floor(processSize * 2)));
 
-    // Scale based on available RAM
     if (availableRamMb > 8192) {
-      // More than 8GB RAM available
-      baseCacheSize = Math.max(baseCacheSize, 4096); // At least 4MB
+      baseCacheSize = Math.max(baseCacheSize, 4096);
     } else if (availableRamMb > 4096) {
-      // More than 4GB RAM available
-      baseCacheSize = Math.max(baseCacheSize, 2048); // At least 2MB
+      baseCacheSize = Math.max(baseCacheSize, 2048);
     } else if (availableRamMb > 2048) {
-      // More than 2GB RAM available
-      baseCacheSize = Math.max(baseCacheSize, 1024); // At least 1MB
+      baseCacheSize = Math.max(baseCacheSize, 1024);
     }
 
     return {
       realpathCacheSize: baseCacheSize + "k",
-      realpathCacheTTL: 120, // 2 minutes as recommended in the article
+      realpathCacheTTL: 120,
     };
   }
 
   // Calculate estimated concurrent users
-  // Assuming 1 request per user with average 1 second response time
   function calculateConcurrentUsers(maxChildren) {
-    // Conservative estimate: each process handles 1 request
-    // With 1 second average response time, maxChildren = concurrent users
     return maxChildren;
   }
 
   // Calculate memory leak impact
-  // Estimates time until server runs out of memory with typical memory leak
   function calculateMemoryLeakImpact(maxChildren, availableRamMb) {
-    // Ensure we have valid inputs
     if (!maxChildren || maxChildren <= 0 || !availableRamMb || availableRamMb <= 0) {
       return "N/A";
     }
 
-    // Assume 1MB per hour per process memory leak (conservative estimate)
     const leakRateMbPerHour = maxChildren * 1;
     const hoursUntilFull = availableRamMb / leakRateMbPerHour;
 
@@ -285,15 +387,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Calculate burst traffic capacity
-  // Maximum requests per second the configuration can handle
   function calculateBurstCapacity(maxChildren) {
-    // Ensure we have valid inputs
     if (!maxChildren || maxChildren <= 0) {
       return "N/A";
     }
 
-    // Assuming average PHP script execution time of 100ms
-    // Each process can handle 10 requests per second
     const requestsPerSecond = maxChildren * 10;
 
     if (requestsPerSecond < 1000) {
@@ -303,51 +401,42 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Improved calculation function based on high traffic optimization guidelines
+  // Improved calculation function
   function updateFields() {
     let ramTotal = parseFloat(document.getElementById("ram-total").value);
     let ramReserved = parseFloat(document.getElementById("ram-reserved").value);
     let ramBuffer = parseFloat(document.getElementById("ram-buffer").value);
     let processSize = parseFloat(document.getElementById("process-size").value);
 
-    // Ensure reserved RAM doesn't exceed total RAM
     if (ramReserved > ramTotal) {
       ramReserved = ramTotal;
       document.getElementById("ram-reserved").value = ramTotal;
       document.getElementById("ram-reserved-val").value = ramTotal;
     }
 
-    // Update display values
     document.getElementById("ram-total-val").value = ramTotal;
     document.getElementById("ram-reserved-val").value = ramReserved;
     document.getElementById("ram-buffer-val").value = ramBuffer;
     document.getElementById("process-size-val").value = processSize;
 
-    // Calculate available RAM
     const buffer = 1 - ramBuffer / 100;
-    const availableRam =
-      Math.round((ramTotal - ramReserved) * buffer * 10) / 10;
+    const availableRam = Math.round((ramTotal - ramReserved) * buffer * 10) / 10;
     const availableRamMb = Math.round(availableRam * 1024);
 
-    // Calculate PHP-FPM process settings with improved ratios for high traffic
     const maxChildren = Math.floor(availableRamMb / processSize);
 
     let startServers, minSpare, maxSpare;
 
     if (pmMode === "static") {
-      // In static mode, all values are equal to max_children
       startServers = maxChildren;
       minSpare = maxChildren;
       maxSpare = maxChildren;
     } else {
-      // Dynamic mode calculations
-      // For high traffic sites, we want more aggressive scaling
       startServers = Math.floor(maxChildren * 0.3);
       minSpare = startServers;
       maxSpare = Math.floor(maxChildren * 0.8);
     }
 
-    // Update result fields
     document.getElementById("ram-available").value = availableRam;
     document.getElementById("ram-available-mb").value = availableRamMb;
     document.getElementById("max-children").value = maxChildren;
@@ -355,20 +444,18 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("min-spare").value = minSpare;
     document.getElementById("max-spare").value = maxSpare;
 
-    // Update realpath cache fields if they exist
-    const realpathCacheSizeField = document.getElementById(
-      "realpath-cache-size"
-    );
+    const realpathCacheSizeField = document.getElementById("realpath-cache-size");
     const realpathCacheTtlField = document.getElementById("realpath-cache-ttl");
 
     if (realpathCacheSizeField && realpathCacheTtlField) {
-      const { realpathCacheSize, realpathCacheTTL } =
-        calculateOptimalRealpathCache(processSize, availableRamMb);
+      const { realpathCacheSize, realpathCacheTTL } = calculateOptimalRealpathCache(
+        processSize,
+        availableRamMb
+      );
       realpathCacheSizeField.value = realpathCacheSize;
       realpathCacheTtlField.value = realpathCacheTTL;
     }
 
-    // Update advanced calculator fields
     const concurrentUsersField = document.getElementById("concurrent-users");
     const memoryLeakImpactField = document.getElementById("memory-leak-impact");
     const burstCapacityField = document.getElementById("burst-capacity");
@@ -385,42 +472,37 @@ document.addEventListener("DOMContentLoaded", function () {
       burstCapacityField.value = calculateBurstCapacity(maxChildren);
     }
 
-    // Validate configuration and display warnings
-    const warnings = validateConfiguration(ramTotal, ramReserved, ramBuffer, processSize, maxChildren);
+    const warnings = validateConfiguration(
+      ramTotal,
+      ramReserved,
+      ramBuffer,
+      processSize,
+      maxChildren
+    );
     displayWarnings(warnings);
 
-    // Generate configuration text for copy/paste
     generateConfigCopy();
 
-    // Save settings to localStorage after a short delay (throttling)
-    clearTimeout(window.saveTimeout);
-    window.saveTimeout = setTimeout(saveSettings, 500);
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveSettings, 500);
   }
 
-  // Enhanced configuration generator with comments for better user guidance
+  // Enhanced configuration generator
   function generateConfigCopy() {
     const maxRequests = document.getElementById("max-requests").value;
-    const processIdleTimeout = document.getElementById(
-      "process-idle-timeout"
-    ).value;
+    const processIdleTimeout = document.getElementById("process-idle-timeout").value;
     const maxSpawnRate = document.getElementById("max-spawn-rate").value;
     const statusPath = document.getElementById("status-path").value;
     const processSize = document.getElementById("process-size").value;
 
-    // Get available RAM to better calculate optimal realpath_cache settings
-    const availableRamMb = parseInt(
-      document.getElementById("ram-available-mb").value || 0
+    const availableRamMb = parseInt(document.getElementById("ram-available-mb").value || 0);
+
+    const { realpathCacheSize, realpathCacheTTL } = calculateOptimalRealpathCache(
+      parseInt(processSize),
+      availableRamMb
     );
 
-    // Get optimal realpath cache settings
-    const { realpathCacheSize, realpathCacheTTL } =
-      calculateOptimalRealpathCache(parseInt(processSize), availableRamMb);
-
-    // Calculate optimal OPcache settings
-    const opcacheMemory = Math.min(
-      512,
-      Math.max(128, Math.floor(parseInt(processSize) * 4))
-    );
+    const opcacheMemory = Math.min(512, Math.max(128, Math.floor(parseInt(processSize) * 4)));
 
     let configText = `; PHP-FPM Pool Configuration for ${currentPool}
 ; Optimized for high-traffic environments
@@ -432,7 +514,6 @@ pm = ${pmMode}
 ; Maximum number of child processes (based on available RAM)
 pm.max_children = ${document.getElementById("max-children").value}`;
 
-    // Only add these settings for dynamic mode
     if (pmMode === "dynamic") {
       configText += `
 
@@ -446,12 +527,10 @@ pm.min_spare_servers = ${document.getElementById("min-spare").value}
 pm.max_spare_servers = ${document.getElementById("max-spare").value}`;
     }
 
-    // Add additional parameters only if they're not empty
     if (maxRequests && maxRequests !== "0") {
       configText += `
 
 ; Maximum number of requests each child process handles before respawning
-; Setting to ${maxRequests} helps prevent memory leaks
 pm.max_requests = ${maxRequests}`;
     }
 
@@ -473,24 +552,18 @@ pm.max_spawn_rate = ${maxSpawnRate}`;
       configText += `
 
 ; URI path for PHP-FPM status page
-; Secure this location in your web server configuration
 pm.status_path = ${statusPath}`;
     }
 
-    // Add additional recommended settings for high traffic
     configText += `
 
 ; PHP Performance Settings
 ; ----------------------
-; Memory settings
 php_admin_value[memory_limit] = ${processSize}M
+php_admin_value[realpath_cache_size] = ${realpathCacheSize}
+php_admin_value[realpath_cache_ttl] = ${realpathCacheTTL}
 
-; Realpath cache optimization - improves file path resolution performance
-; Optimized based on recommendations from: https://linuxblog.io/set-monitor-phps-realpath_cache_size-correctly/
-php_admin_value[realpath_cache_size] = ${realpathCacheSize}  ; Optimized for ${availableRamMb}MB available RAM
-php_admin_value[realpath_cache_ttl] = ${realpathCacheTTL}    ; 2 minutes is optimal for most sites
-
-; OPcache settings for optimal performance
+; OPcache settings
 php_admin_value[opcache.enable] = 1
 php_admin_value[opcache.memory_consumption] = ${opcacheMemory}
 php_admin_value[opcache.interned_strings_buffer] = 16
@@ -512,42 +585,51 @@ php_admin_value[max_execution_time] = 60
 php_admin_value[max_input_time] = 60
 `;
 
-    // Update the hidden textarea for copying
     document.getElementById("copyPasteArea").value = configText.trim();
 
-    // Update the visible code preview with syntax highlighting
     const codePreview = document.getElementById("codePreview");
     if (codePreview) {
       codePreview.textContent = configText.trim();
     }
   }
 
-  // Function to copy text to clipboard with visual feedback
-  function copyToClipboard() {
-    const copyText = document.getElementById("copyPasteArea");
-    copyText.select();
-    document.execCommand("copy");
-
-    // Get copy button
+  // Function to copy text to clipboard (modern Clipboard API)
+  async function copyToClipboard() {
+    const copyText = document.getElementById("copyPasteArea").value;
     const copyButton = document.getElementById("buttonCopy");
-    const originalText = copyButton.textContent;
 
-    // Show success feedback
-    copyButton.textContent = "✓ Copied!";
-    copyButton.classList.add("bg-green-500");
-    copyButton.classList.remove("bg-blue-500");
+    try {
+      await navigator.clipboard.writeText(copyText);
 
-    // Reset button after 2 seconds
-    setTimeout(() => {
-      copyButton.textContent = originalText;
-      copyButton.classList.remove("bg-green-500");
-      copyButton.classList.add("bg-blue-500");
-    }, 2000);
+      // Show success feedback
+      copyButton.classList.add("bg-green-500");
+      copyButton.classList.remove("bg-blue-500");
+
+      const originalText = copyButton.textContent;
+      copyButton.textContent = "Copied!";
+
+      setTimeout(() => {
+        copyButton.textContent = originalText;
+        copyButton.classList.remove("bg-green-500");
+        copyButton.classList.add("bg-blue-500");
+      }, 2000);
+    } catch (_unused) {
+      // Fallback for older browsers
+      const textarea = document.getElementById("copyPasteArea");
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        showToast("Copied to clipboard!", "success");
+      } catch (_fallbackUnused) {
+        showToast("Failed to copy. Please copy manually.", "error");
+      }
+    }
   }
 
   // Add a new pool
   function addNewPool() {
     document.getElementById("pool-name-container").classList.remove("hidden");
+    document.getElementById("pool-name").focus();
   }
 
   // Save a new pool
@@ -555,53 +637,77 @@ php_admin_value[max_input_time] = 60
     const poolNameInput = document.getElementById("pool-name");
     const poolName = poolNameInput.value.trim();
 
-    if (!poolName) {
-      alert("Please enter a valid pool name");
+    const validation = validatePoolName(poolName);
+    if (!validation.valid) {
+      showToast(validation.message, "error");
       return;
     }
 
-    // Add to pools object if it doesn't exist
-    if (!pools[poolName]) {
-      pools[poolName] = true;
+    pools[poolName] = true;
 
-      // Add to dropdown
-      const option = document.createElement("option");
-      option.value = poolName;
-      option.textContent = poolName;
-      document.getElementById("current-pool").appendChild(option);
+    const option = document.createElement("option");
+    option.value = poolName;
+    option.textContent = poolName;
+    document.getElementById("current-pool").appendChild(option);
 
-      // Select the new pool
-      document.getElementById("current-pool").value = poolName;
-      switchPool(poolName);
-    }
+    document.getElementById("current-pool").value = poolName;
+    switchPool(poolName);
 
-    // Hide the input container
     document.getElementById("pool-name-container").classList.add("hidden");
     poolNameInput.value = "";
+
+    showToast(`Pool "${poolName}" created successfully!`, "success");
+  }
+
+  // Delete current pool
+  function deleteCurrentPool() {
+    if (currentPool === DEFAULT_POOL) {
+      showToast("Cannot delete the default pool", "warning");
+      return;
+    }
+
+    const poolName = currentPool;
+
+    delete pools[poolName];
+    localStorage.removeItem(getStorageKey(poolName));
+
+    localStorage.setItem(STORAGE_KEY_PREFIX + "pools", JSON.stringify(Object.keys(pools)));
+
+    const poolSelect = document.getElementById("current-pool");
+    const optionToRemove = Array.from(poolSelect.options).find(opt => opt.value === poolName);
+    if (optionToRemove) {
+      poolSelect.removeChild(optionToRemove);
+    }
+
+    poolSelect.value = DEFAULT_POOL;
+    switchPool(DEFAULT_POOL);
+
+    showToast(`Pool "${poolName}" deleted`, "success");
   }
 
   // Switch to a different pool
   function switchPool(poolName) {
-    // Save current settings before switching
     saveSettings();
 
-    // Update current pool
     currentPool = poolName;
 
-    // Update UI to show current pool
-    document.getElementById(
-      "current-pool-name"
-    ).textContent = `Current Pool: ${poolName}`;
+    document.getElementById("current-pool-name").textContent = `Current Pool: ${poolName}`;
 
-    // Load settings for the selected pool
+    const deleteBtn = document.getElementById("delete-pool");
+    if (deleteBtn) {
+      if (poolName === DEFAULT_POOL) {
+        deleteBtn.classList.add("hidden");
+      } else {
+        deleteBtn.classList.remove("hidden");
+      }
+    }
+
     const hasSettings = loadSettings(poolName);
 
-    // If no settings found, use defaults
     if (!hasSettings) {
       resetToDefaults();
     }
 
-    // Update calculations
     updateFields();
   }
 
@@ -616,13 +722,11 @@ php_admin_value[max_input_time] = 60
     document.getElementById("process-size").value = 32;
     document.getElementById("process-size-val").value = 32;
 
-    // Additional PHP-FPM parameters
-    document.getElementById("max-requests").value = 500; // Changed from 0 to 500 for high traffic
+    document.getElementById("max-requests").value = 500;
     document.getElementById("process-idle-timeout").value = 10;
     document.getElementById("max-spawn-rate").value = 32;
     document.getElementById("status-path").value = "/status";
 
-    // Reset to dynamic mode by default
     pmMode = "dynamic";
     updatePmModeUI();
   }
@@ -634,11 +738,9 @@ php_admin_value[max_input_time] = 60
 
       if (savedPoolsStr) {
         const savedPools = JSON.parse(savedPoolsStr);
-
-        // Add each saved pool to the dropdown
         const poolSelect = document.getElementById("current-pool");
 
-        savedPools.forEach((poolName) => {
+        savedPools.forEach(poolName => {
           if (poolName !== DEFAULT_POOL) {
             pools[poolName] = true;
 
@@ -658,197 +760,181 @@ php_admin_value[max_input_time] = 60
     return false;
   }
 
-  // Add PM mode toggle button to the UI if it doesn't exist
+  // Create PM mode toggle using DOM methods (safe)
   function createPmModeToggle() {
-    // Check if we already have a PM mode selector
-    if (!document.getElementById("pm-mode-container")) {
-      // Find a good place to insert the toggle
-      const additionalParamsSection = document.querySelector(
-        ".bg-gray-50.p-4.rounded-md.border.border-gray-200"
-      );
+    if (document.getElementById("pm-mode-container")) return;
 
-      if (additionalParamsSection) {
-        // Create the toggle element
-        const pmModeContainer = document.createElement("div");
-        pmModeContainer.id = "pm-mode-container";
-        pmModeContainer.className = "mb-4";
-
-        pmModeContainer.innerHTML = `
-          <h4 class="text-lg font-bold text-gray-800 mb-2">Process Manager Mode</h4>
-          <div class="flex space-x-4">
-            <label class="inline-flex items-center">
-              <input type="radio" name="pm-mode" value="dynamic" class="mr-2" ${
-                pmMode === "dynamic" ? "checked" : ""
-              }>
-              <span>Dynamic (variable load)</span>
-            </label>
-            <label class="inline-flex items-center">
-              <input type="radio" name="pm-mode" value="static" class="mr-2" ${
-                pmMode === "static" ? "checked" : ""
-              }>
-              <span>Static (high performance)</span>
-            </label>
-          </div>
-          <p class="text-sm text-gray-600 mt-1">Static mode provides better performance but uses more resources.</p>
-        `;
-
-        // Insert before the additional params section
-        additionalParamsSection.parentNode.insertBefore(
-          pmModeContainer,
-          additionalParamsSection
-        );
-
-        // Add event listeners to the radio buttons
-        const radios = pmModeContainer.querySelectorAll('input[type="radio"]');
-        radios.forEach((radio) => {
-          radio.addEventListener("change", function () {
-            togglePmMode(this.value);
-          });
-        });
-      }
-    }
-  }
-
-  // Function to add realpath cache section to the UI
-  function addRealpathCacheSection() {
-    // Find a good place to insert the realpath cache section
-    const phpfpmSettings = document.querySelector(
-      ".border-l-4.border-green-500.bg-green-50"
+    const additionalParamsSection = document.querySelector(
+      ".bg-gray-50.p-4.rounded-md.border.border-gray-200"
     );
 
-    if (phpfpmSettings) {
-      // Create the realpath cache section
-      const realpathSection = document.createElement("div");
-      realpathSection.className = "mb-8";
-      realpathSection.innerHTML = `
-        <div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-md">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">Realpath Cache Settings</h3>
-          <p class="text-sm text-gray-600 mb-4">
-            The realpath cache stores file paths that PHP accesses, improving performance by avoiding repeated filesystem lookups.
-            Values are automatically optimized based on your server configuration.
-          </p>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label for="realpath-cache-size" class="block text-sm font-medium text-gray-600 mb-1">
-                realpath_cache_size
-              </label>
-              <input id="realpath-cache-size" type="text" readonly 
-                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 font-bold text-blue-800">
-            </div>
-            
-            <div>
-              <label for="realpath-cache-ttl" class="block text-sm font-medium text-gray-600 mb-1">
-                realpath_cache_ttl
-              </label>
-              <input id="realpath-cache-ttl" type="text" readonly 
-                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 font-bold text-blue-800">
-            </div>
-          </div>
-        </div>
-      `;
+    if (!additionalParamsSection) return;
 
-      // Insert the realpath cache section after the PHP-FPM Settings section
-      phpfpmSettings.parentNode.insertBefore(
-        realpathSection,
-        phpfpmSettings.nextSibling
-      );
+    const pmModeContainer = document.createElement("div");
+    pmModeContainer.id = "pm-mode-container";
+    pmModeContainer.className = "mb-4";
 
-      // Initialize the values
-      const availableRamMb = parseInt(
-        document.getElementById("ram-available-mb").value || 0
-      );
-      const processSize = parseFloat(
-        document.getElementById("process-size").value
-      );
-      const { realpathCacheSize, realpathCacheTTL } =
-        calculateOptimalRealpathCache(processSize, availableRamMb);
+    const h4 = document.createElement("h4");
+    h4.className = "text-lg font-bold text-gray-800 dark:text-white mb-2";
+    h4.textContent = "Process Manager Mode";
 
-      document.getElementById("realpath-cache-size").value = realpathCacheSize;
-      document.getElementById("realpath-cache-ttl").value = realpathCacheTTL;
-    }
+    const radioGroup = document.createElement("div");
+    radioGroup.className = "flex flex-wrap gap-4";
+    radioGroup.setAttribute("role", "radiogroup");
+    radioGroup.setAttribute("aria-label", "Process Manager Mode");
+
+    // Dynamic option
+    const dynamicLabel = document.createElement("label");
+    dynamicLabel.className = "inline-flex items-center cursor-pointer";
+
+    const dynamicRadio = document.createElement("input");
+    dynamicRadio.type = "radio";
+    dynamicRadio.name = "pm-mode";
+    dynamicRadio.value = "dynamic";
+    dynamicRadio.className = "mr-2";
+    dynamicRadio.checked = pmMode === "dynamic";
+
+    const dynamicText = document.createElement("span");
+    dynamicText.className = "text-gray-700 dark:text-gray-300";
+    dynamicText.textContent = "Dynamic (variable load)";
+
+    dynamicLabel.appendChild(dynamicRadio);
+    dynamicLabel.appendChild(dynamicText);
+
+    // Static option
+    const staticLabel = document.createElement("label");
+    staticLabel.className = "inline-flex items-center cursor-pointer";
+
+    const staticRadio = document.createElement("input");
+    staticRadio.type = "radio";
+    staticRadio.name = "pm-mode";
+    staticRadio.value = "static";
+    staticRadio.className = "mr-2";
+    staticRadio.checked = pmMode === "static";
+
+    const staticText = document.createElement("span");
+    staticText.className = "text-gray-700 dark:text-gray-300";
+    staticText.textContent = "Static (high performance)";
+
+    staticLabel.appendChild(staticRadio);
+    staticLabel.appendChild(staticText);
+
+    radioGroup.appendChild(dynamicLabel);
+    radioGroup.appendChild(staticLabel);
+
+    const description = document.createElement("p");
+    description.id = "pm-mode-desc";
+    description.className = "text-sm text-gray-600 dark:text-gray-400 mt-1";
+    description.textContent = "Static mode provides better performance but uses more resources.";
+
+    pmModeContainer.appendChild(h4);
+    pmModeContainer.appendChild(radioGroup);
+    pmModeContainer.appendChild(description);
+
+    additionalParamsSection.parentNode.insertBefore(pmModeContainer, additionalParamsSection);
+
+    // Add event listeners
+    dynamicRadio.addEventListener("change", function () {
+      if (this.checked) togglePmMode("dynamic");
+    });
+    staticRadio.addEventListener("change", function () {
+      if (this.checked) togglePmMode("static");
+    });
   }
 
-  // Add new FAQ items related to PHP optimization
-  function addOptimizationFAQs() {
-    const faqAccordion = document.getElementById("faqAccordion");
+  // Add realpath cache section using DOM methods (safe)
+  function addRealpathCacheSection() {
+    const phpfpmSettings = document.querySelector(".border-l-4.border-green-500.bg-green-50");
 
-    if (faqAccordion) {
-      // Create new FAQ items
-      const newFAQs = [
-        {
-          question: "What is realpath_cache_size and why is it important?",
-          answer:
-            "The realpath_cache stores the resolved file paths that PHP accesses, avoiding repeated file system lookups. This significantly improves performance, especially for applications with many included files (like WordPress or any framework). According to the Linux Blog, properly sizing this cache can lead to 10-30% performance improvements. Our calculator automatically recommends an optimal setting based on your RAM and process size.",
-        },
-        {
-          question:
-            "What is the difference between dynamic and static PM modes?",
-          answer:
-            "Dynamic mode adjusts the number of PHP-FPM processes based on demand, which is good for variable traffic. Static mode maintains a fixed number of processes at all times, providing better performance for high-traffic sites at the cost of higher resource usage.",
-        },
-        {
-          question: "What is realpath_cache and why is it important?",
-          answer:
-            "The realpath cache stores the real file paths of files that PHP opens, avoiding the need for repeated file system lookups. Properly sizing this cache significantly improves performance, especially for applications with many included files like WordPress or frameworks.",
-        },
-        {
-          question: "Why is OPcache important for PHP performance?",
-          answer:
-            "OPcache improves PHP performance by storing precompiled script bytecode in memory, eliminating the need for PHP to load and parse scripts on each request. This can result in a 30-70% performance improvement depending on your application.",
-        },
-        {
-          question: "How does pm.max_requests help with memory leaks?",
-          answer:
-            "The pm.max_requests setting defines the number of requests each child process should execute before respawning. This helps mitigate memory leaks in PHP applications by periodically refreshing processes, preventing them from growing too large over time.",
-        },
-        {
-          question:
-            "Should I set memory_limit to the same value as process size?",
-          answer:
-            "Yes, it's good practice to set the memory_limit to match your estimated process size. This ensures PHP processes don't use more memory than you've planned for in your calculations, preventing potential server instability.",
-        },
-      ];
+    if (!phpfpmSettings) return;
 
-      // Add the new FAQs to the accordion
-      newFAQs.forEach((faq) => {
-        const faqItem = document.createElement("div");
-        faqItem.className =
-          "faq-item border border-gray-200 rounded-md overflow-hidden";
+    const realpathSection = document.createElement("div");
+    realpathSection.className = "mb-8";
 
-        faqItem.innerHTML = `
-          <button class="faq-question w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center font-medium text-gray-700 focus:outline-none">
-            <span>${faq.question}</span>
-            <svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <div class="faq-answer hidden p-4 bg-white border-t border-gray-200">
-            <p class="text-gray-600">${faq.answer}</p>
-          </div>
-        `;
+    const container = document.createElement("div");
+    container.className =
+      "p-4 border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 rounded-md";
 
-        faqAccordion.appendChild(faqItem);
-      });
+    const h3 = document.createElement("h3");
+    h3.className = "text-lg font-bold text-gray-800 dark:text-white mb-4";
+    h3.textContent = "Realpath Cache Settings";
 
-      // Re-initialize FAQ accordion after adding new FAQs
-      initFaqAccordion();
-    }
+    const p = document.createElement("p");
+    p.className = "text-sm text-gray-600 dark:text-gray-400 mb-4";
+    p.textContent =
+      "The realpath cache stores file paths that PHP accesses, improving performance by avoiding repeated filesystem lookups.";
+
+    const grid = document.createElement("div");
+    grid.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
+
+    // Cache size field
+    const sizeDiv = document.createElement("div");
+    const sizeLabel = document.createElement("label");
+    sizeLabel.setAttribute("for", "realpath-cache-size");
+    sizeLabel.className = "block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1";
+    sizeLabel.textContent = "realpath_cache_size";
+
+    const sizeInput = document.createElement("input");
+    sizeInput.id = "realpath-cache-size";
+    sizeInput.type = "text";
+    sizeInput.readOnly = true;
+    sizeInput.setAttribute("aria-readonly", "true");
+    sizeInput.className =
+      "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 font-bold text-blue-800 dark:text-blue-400";
+
+    sizeDiv.appendChild(sizeLabel);
+    sizeDiv.appendChild(sizeInput);
+
+    // TTL field
+    const ttlDiv = document.createElement("div");
+    const ttlLabel = document.createElement("label");
+    ttlLabel.setAttribute("for", "realpath-cache-ttl");
+    ttlLabel.className = "block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1";
+    ttlLabel.textContent = "realpath_cache_ttl";
+
+    const ttlInput = document.createElement("input");
+    ttlInput.id = "realpath-cache-ttl";
+    ttlInput.type = "text";
+    ttlInput.readOnly = true;
+    ttlInput.setAttribute("aria-readonly", "true");
+    ttlInput.className =
+      "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 font-bold text-blue-800 dark:text-blue-400";
+
+    ttlDiv.appendChild(ttlLabel);
+    ttlDiv.appendChild(ttlInput);
+
+    grid.appendChild(sizeDiv);
+    grid.appendChild(ttlDiv);
+
+    container.appendChild(h3);
+    container.appendChild(p);
+    container.appendChild(grid);
+    realpathSection.appendChild(container);
+
+    phpfpmSettings.parentNode.insertBefore(realpathSection, phpfpmSettings.nextSibling);
+
+    // Initialize values
+    const availableRamMb = parseInt(document.getElementById("ram-available-mb").value || 0);
+    const processSize = parseFloat(document.getElementById("process-size").value);
+    const { realpathCacheSize, realpathCacheTTL } = calculateOptimalRealpathCache(
+      processSize,
+      availableRamMb
+    );
+
+    sizeInput.value = realpathCacheSize;
+    ttlInput.value = realpathCacheTTL;
   }
 
   // Add event listeners to sliders and inputs
   const inputIds = ["ram-total", "ram-reserved", "ram-buffer", "process-size"];
 
-  inputIds.forEach((id) => {
+  inputIds.forEach(id => {
     const slider = document.getElementById(id);
     const valueInput = document.getElementById(`${id}-val`);
 
-    // Update when slider changes
     slider.addEventListener("input", updateFields);
     slider.addEventListener("change", updateFields);
 
-    // Update when value input changes
     valueInput.addEventListener("input", function () {
       slider.value = this.value;
       updateFields();
@@ -867,68 +953,72 @@ php_admin_value[max_input_time] = 60
     "max-spawn-rate",
     "status-path",
   ];
-  additionalParams.forEach((id) => {
+  additionalParams.forEach(id => {
     const input = document.getElementById(id);
-    input.addEventListener("input", function () {
-      updateFields();
-    });
-    input.addEventListener("change", function () {
-      updateFields();
-    });
+    input.addEventListener("input", updateFields);
+    input.addEventListener("change", updateFields);
   });
 
   // Export settings to JSON file
   function exportSettings() {
     const allSettings = {};
 
-    // Export all pool settings
-    Object.keys(pools).forEach((poolName) => {
+    Object.keys(pools).forEach(poolName => {
       const savedSettingsStr = localStorage.getItem(getStorageKey(poolName));
       if (savedSettingsStr) {
         allSettings[poolName] = JSON.parse(savedSettingsStr);
       }
     });
 
-    // Create export data
     const exportData = {
       version: "1.2.0",
       exportDate: new Date().toISOString(),
       pools: allSettings,
-      currentPool: currentPool
+      currentPool: currentPool,
     };
 
-    // Create blob and download
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `php-fpm-settings-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `php-fpm-settings-${new Date().toISOString().split("T")[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+
+    showToast("Settings exported successfully!", "success");
   }
 
   // Import settings from JSON file
   function importSettings(file) {
+    if (file.size > 1024 * 1024) {
+      showToast("File is too large. Maximum size is 1MB.", "error");
+      return;
+    }
+
     const reader = new FileReader();
 
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       try {
         const importData = JSON.parse(e.target.result);
 
-        // Validate import data
-        if (!importData.pools) {
-          alert("Invalid settings file format");
+        if (!importData.pools || typeof importData.pools !== "object") {
+          showToast("Invalid settings file format", "error");
           return;
         }
 
-        // Import all pool settings
-        Object.keys(importData.pools).forEach((poolName) => {
+        let importedCount = 0;
+        Object.keys(importData.pools).forEach(poolName => {
+          const validation = validatePoolName(poolName);
+          if (!validation.valid && !pools[poolName]) {
+            console.warn(`Skipping invalid pool name: ${poolName}`);
+            return;
+          }
+
           pools[poolName] = true;
           localStorage.setItem(getStorageKey(poolName), JSON.stringify(importData.pools[poolName]));
 
-          // Add to dropdown if not exists
           const poolSelect = document.getElementById("current-pool");
           const existingOption = Array.from(poolSelect.options).find(opt => opt.value === poolName);
 
@@ -938,24 +1028,24 @@ php_admin_value[max_input_time] = 60
             option.textContent = poolName;
             poolSelect.appendChild(option);
           }
+          importedCount++;
         });
 
-        // Save pools list
-        localStorage.setItem(
-          STORAGE_KEY_PREFIX + "pools",
-          JSON.stringify(Object.keys(pools))
-        );
+        localStorage.setItem(STORAGE_KEY_PREFIX + "pools", JSON.stringify(Object.keys(pools)));
 
-        // Switch to imported current pool or first pool
         const targetPool = importData.currentPool || Object.keys(pools)[0];
         document.getElementById("current-pool").value = targetPool;
         switchPool(targetPool);
 
-        alert("Settings imported successfully!");
+        showToast(`Imported ${importedCount} pool(s) successfully!`, "success");
       } catch (error) {
         console.error("Import error:", error);
-        alert("Failed to import settings. Please check the file format.");
+        showToast("Failed to import settings. Please check the file format.", "error");
       }
+    };
+
+    reader.onerror = function () {
+      showToast("Failed to read file", "error");
     };
 
     reader.readAsText(file);
@@ -963,32 +1053,33 @@ php_admin_value[max_input_time] = 60
 
   // Pool management event listeners
   document.getElementById("add-pool").addEventListener("click", addNewPool);
-  document
-    .getElementById("save-pool-name")
-    .addEventListener("click", savePoolName);
-  document
-    .getElementById("current-pool")
-    .addEventListener("change", function () {
-      switchPool(this.value);
-    });
+  document.getElementById("save-pool-name").addEventListener("click", savePoolName);
+
+  document.getElementById("pool-name").addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      savePoolName();
+    }
+  });
+
+  document.getElementById("current-pool").addEventListener("change", function () {
+    switchPool(this.value);
+  });
 
   // Export/Import event listeners
   document.getElementById("export-settings").addEventListener("click", exportSettings);
-  document.getElementById("import-settings").addEventListener("click", function() {
+  document.getElementById("import-settings").addEventListener("click", function () {
     document.getElementById("import-file").click();
   });
-  document.getElementById("import-file").addEventListener("change", function(e) {
+  document.getElementById("import-file").addEventListener("change", function (e) {
     if (e.target.files.length > 0) {
       importSettings(e.target.files[0]);
-      // Reset file input
       e.target.value = "";
     }
   });
 
   // Copy button event listener
-  document
-    .getElementById("buttonCopy")
-    .addEventListener("click", copyToClipboard);
+  document.getElementById("buttonCopy").addEventListener("click", copyToClipboard);
 
   // Dark mode toggle event listener
   document.getElementById("dark-mode-toggle").addEventListener("click", toggleDarkMode);
@@ -1008,41 +1099,87 @@ php_admin_value[max_input_time] = 60
   // Add realpath cache section to the UI
   addRealpathCacheSection();
 
-  // Add new FAQs about optimization
-  addOptimizationFAQs();
-
   // Initial calculation on page load
   updateFields();
 
-  // FAQ Accordion functionality - Reattach event listeners to all FAQ questions
+  // FAQ Accordion functionality with proper ARIA support
   function initFaqAccordion() {
-    const faqQuestions = document.querySelectorAll(".faq-question");
+    const faqContainer = document.getElementById("faqAccordion");
+    if (!faqContainer) return;
 
-    faqQuestions.forEach((question) => {
-      // Remove any existing event listeners first to prevent duplicates
-      const questionClone = question.cloneNode(true);
-      question.parentNode.replaceChild(questionClone, question);
-
-      // Add event listeners to the cloned elements
-      questionClone.addEventListener("click", function () {
-        // Toggle the active class on the question
-        this.classList.toggle("active");
-
-        // Find the associated answer
-        const answer = this.nextElementSibling;
-
-        // Toggle the answer visibility
-        if (answer.classList.contains("hidden")) {
-          answer.classList.remove("hidden");
-          this.querySelector(".faq-arrow").classList.add("rotate-180");
-        } else {
-          answer.classList.add("hidden");
-          this.querySelector(".faq-arrow").classList.remove("rotate-180");
-        }
-      });
+    // Use event delegation
+    faqContainer.addEventListener("click", function (e) {
+      const question = e.target.closest(".faq-question");
+      if (!question) return;
+      toggleFaqItem(question);
     });
+
+    faqContainer.addEventListener("keydown", function (e) {
+      const question = e.target.closest(".faq-question");
+      if (!question) return;
+
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleFaqItem(question);
+      }
+    });
+
+    // Initialize ARIA attributes
+    const faqQuestions = document.querySelectorAll(".faq-question");
+    faqQuestions.forEach((question, index) => {
+      const answer = question.nextElementSibling;
+      const questionId = `faq-question-${index}`;
+      const answerId = `faq-answer-${index}`;
+
+      question.setAttribute("id", questionId);
+      question.setAttribute("aria-expanded", "false");
+      question.setAttribute("aria-controls", answerId);
+
+      if (answer) {
+        answer.setAttribute("id", answerId);
+        answer.setAttribute("role", "region");
+        answer.setAttribute("aria-labelledby", questionId);
+      }
+    });
+  }
+
+  function toggleFaqItem(question) {
+    const answer = question.nextElementSibling;
+    const isExpanded = question.getAttribute("aria-expanded") === "true";
+
+    question.setAttribute("aria-expanded", (!isExpanded).toString());
+    question.classList.toggle("active");
+
+    if (answer) {
+      answer.classList.toggle("hidden");
+      const arrow = question.querySelector(".faq-arrow");
+      if (arrow) {
+        arrow.classList.toggle("rotate-180");
+      }
+    }
   }
 
   // Initialize FAQ accordion
   initFaqAccordion();
+
+  // Add delete pool button
+  function addDeletePoolButton() {
+    const addPoolBtn = document.getElementById("add-pool");
+    if (!addPoolBtn || document.getElementById("delete-pool")) return;
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.id = "delete-pool";
+    deleteBtn.className =
+      "px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors hidden";
+    deleteBtn.textContent = "Delete Pool";
+    deleteBtn.setAttribute("type", "button");
+    deleteBtn.addEventListener("click", function () {
+      if (confirm(`Are you sure you want to delete the pool "${currentPool}"?`)) {
+        deleteCurrentPool();
+      }
+    });
+    addPoolBtn.parentNode.insertBefore(deleteBtn, addPoolBtn.nextSibling);
+  }
+
+  addDeletePoolButton();
 });

@@ -23,7 +23,7 @@ npx @tailwindcss/cli -i ./assets/style.css -o ./assets/style.min.css --watch
 - Generate a minified version of the CSS
 
 ```bash
-npx @tailwindcss/cli -i ./assets/style.css -o ./assets/style.min.css --minify 
+npx @tailwindcss/cli -i ./assets/style.css -o ./assets/style.min.css --minify
 
 ```
 
